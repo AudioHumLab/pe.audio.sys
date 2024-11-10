@@ -17,6 +17,7 @@
 from    os.path     import expanduser
 import  sys
 import  threading
+from    socket      import gethostname
 from    time        import sleep
 import  json
 from    subprocess  import Popen, run
@@ -27,13 +28,13 @@ sys.path.append(f'{UHOME}/pe.audio.sys/share/miscel')
 
 
 from  config                        import  CONFIG, PLAYER_META_PATH,   \
-                                            METATEMPLATE,               \
-                                            CDDA_INFO_PATH,             \
-                                            CDDA_INFO_TEMPLATE
+                                            PLAYER_METATEMPLATE,        \
+                                            CDDA_META_PATH,             \
+                                            CDDA_META_TEMPLATE
 
 from  miscel                        import  detect_spotify_client,      \
                                             read_state_from_disk,       \
-                                            read_cdda_info_from_disk,   \
+                                            read_cdda_meta_from_disk,   \
                                             read_mpd_config,            \
                                             send_cmd, is_IP, Fmt
 
@@ -41,6 +42,7 @@ from  players_mod.mpd_mod           import  mpd_control,                \
                                             mpd_meta,                   \
                                             mpd_playlist,               \
                                             mpd_playlists,              \
+                                            mpd_get_cd_track_nums,      \
                                             mpd_cdda_in_playlist
 
 from  players_mod.mplayer           import  mplayer_control,            \
@@ -62,8 +64,29 @@ SOURCES = CONFIG["sources"]
 SPOTIFY_CLIENT = detect_spotify_client()
 
 # The runtime metadata variable and the loop refresh period in seconds
-CURRENT_MD          = METATEMPLATE.copy()
+CURRENT_MD          = PLAYER_METATEMPLATE.copy()
 MD_REFRESH_PERIOD   = 2
+
+
+def clear_cdda_stuff():
+
+        # Clearing MPD cd playlist
+        if mpd_cdda_in_playlist(all_or_any='any'):
+            print(f'{Fmt.MAGENTA}(players.py) Clearing MPD playlist{Fmt.END}')
+            run( 'mpc stop'.split()  )
+            sleep(.2)
+            run( 'mpc clear'.split() )
+            sleep(1)
+
+        # blank pe.audio.sys/.cdda_metadata
+        print(f'{Fmt.MAGENTA}(players.py) clearing `{CDDA_META_PATH}`{Fmt.END}')
+        with open(CDDA_META_PATH, 'w') as f:
+            f.write( json.dumps(CDDA_META_TEMPLATE.copy()) )
+
+        # delete MPD cdda playlist files (M3U/PLS)
+        fname = f'{ read_mpd_config()["playlist_directory"] }/cdda_*'
+        print(f'{Fmt.MAGENTA}(players.py) clearing {fname}{Fmt.END}')
+        Popen( f'rm -f {fname}', shell=True )
 
 
 def remote_get_meta(host, port=9990):
@@ -74,7 +97,7 @@ def remote_get_meta(host, port=9990):
                         host=host, port=port, timeout=1)
         md = json.loads(tmp)
     except:
-        md = METATEMPLATE.copy()
+        md = PLAYER_METATEMPLATE.copy()
     return md
 
 
@@ -92,16 +115,19 @@ def get_meta():
     """ Returns a dictionary with the current track metadata
         including the involved source player
     """
-    md = METATEMPLATE.copy()
+    md = PLAYER_METATEMPLATE.copy()
 
     source      = read_state_from_disk()['input']
     source_port = read_state_from_disk()['input_port']
 
     if 'librespot' in source or 'spotify' in source.lower():
+
         if SPOTIFY_CLIENT == 'desktop':
             md = spotify_meta(md)
+
         elif SPOTIFY_CLIENT == 'librespot':
             md = librespot_meta(md)
+
         # source is spotify like but no client running has been detected:
         else:
             md['player'] = 'Spotify'
@@ -120,6 +146,7 @@ def get_meta():
         md = mpd_meta(md)
 
     elif source.startswith('remote'):
+
         # For a 'remote.....' named source, it is expected to have
         # an IP address kind of in its jack_pname field:
         #   jack_pname:  X.X.X.X:PPPP
@@ -135,7 +162,6 @@ def get_meta():
     if not md['artist']:
         md['artist'] = f'- {source.upper()} -'
 
-
     return md
 
 
@@ -144,6 +170,16 @@ def playback_control(cmd, arg=''):
         returns: 'stop' | 'play' | 'pause'
     """
 
+    def  check_mpd_playlist_is_cd():
+        """ If the MPD playlist is NOT a CD kind of
+            will load the CD playlist.
+        """
+        if not mpd_cdda_in_playlist('all'):
+
+            mpd_playlists('clear_playlist')
+            mpd_playlists('load_playlist',  f'cdda_{gethostname()}')
+
+
     result = 'stop'
     source = read_state_from_disk()['input']
 
@@ -151,10 +187,13 @@ def playback_control(cmd, arg=''):
         result = mpd_control(cmd, arg)
 
     elif source.lower() == 'spotify':
+
         if   SPOTIFY_CLIENT == 'desktop':
             result = spotify_control(cmd, arg)
+
         elif SPOTIFY_CLIENT == 'librespot':
             result = librespot_control(cmd)
+
         else:
             result = 'stop'
 
@@ -165,7 +204,7 @@ def playback_control(cmd, arg=''):
         result = mplayer_control(cmd=cmd, service='istreams')
 
     elif source == 'cd':
-        #result = mplayer_control(cmd=cmd, arg=arg, service='cdda')
+        check_mpd_playlist_is_cd()
         result = mpd_control(cmd, arg)
 
     elif source.startswith('remote'):
@@ -197,6 +236,9 @@ def playlists_control(cmd, arg):
 
         if cmd == 'get_playlist':
             result = mpd_playlist()
+
+        elif cmd == 'get_cd_track_nums':
+            result = mpd_get_cd_track_nums()
 
         else:
             result = mpd_playlists(cmd, arg)
@@ -241,23 +283,28 @@ def get_all_info():
             'state':        playback_control( 'state' ),
             'random_mode':  random_control('get'),
             'metadata':     CURRENT_MD,
-            'discid':       read_cdda_info_from_disk()['discid']
+            'discid':       read_cdda_meta_from_disk()['discid']
             }
 
 
 # Autoexec when loading this module
-def init():
+def loop_getting_metadata():
     """ This init function will thread the storing metadata LOOP FOREVER
     """
 
     def store_meta_loop(period=2):
+
         global CURRENT_MD
+
         while True:
+
             # Update the global runtime variable CURRENT_MD
             CURRENT_MD = get_meta()
+
             # Save metadata to disk file.
             with open(PLAYER_META_PATH, 'w') as f:
                 f.write( json.dumps( CURRENT_MD ) )
+
             # Wait for period
             sleep(period)
 
@@ -292,34 +339,20 @@ def do(cmd, arg):
     elif cmd == 'get_all_info':
         result = get_all_info()
 
+    elif cmd == 'get_cd_track_nums':
+        result = playlists_control( cmd, arg )
+
     elif '_playlist' in cmd:
         result = playlists_control( cmd, arg )
 
     # (i) Must be a clean eject
     elif cmd == 'eject':
 
-        if mpd_cdda_in_playlist(all_or_any='any'):
-            print(f'{Fmt.GRAY}(players.py) Clearing MPD playlist{Fmt.END}')
-            run( 'mpc stop'.split()  )
-            sleep(.2)
-            run( 'mpc clear'.split() )
-            sleep(1)
-
-        print(f'{Fmt.BLUE}(players.py) ejecting disc...{Fmt.END}')
+        print(f'{Fmt.MAGENTA}(players.py) ejecting disc...{Fmt.END}')
+        clear_cdda_stuff()
         Popen( 'eject'.split() )
         result = 'ordered'
-
         sleep(1)
-
-        # blank cdda_info
-        print(f'{Fmt.GRAY}(players.py) clearing `.cdda_info`{Fmt.END}')
-        with open(CDDA_INFO_PATH, 'w') as f:
-            f.write( json.dumps(CDDA_INFO_TEMPLATE) )
-
-        # delete MPD cdda playlist files
-        print(f'{Fmt.GRAY}(players.py) clearing MPD `cdda.m3u/pls`{Fmt.END}')
-        fname = f'{ read_mpd_config()["playlist_directory"] }/cdda.*'
-        Popen( f'rm -f {fname}', shell=True )
 
     else:
         result = f'(players) unknown command \'{cmd}\''
@@ -328,4 +361,4 @@ def do(cmd, arg):
 
 
 # Autoexec when loading this module
-init()
+loop_getting_metadata()

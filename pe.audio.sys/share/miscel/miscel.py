@@ -783,15 +783,15 @@ def read_metadata_from_disk():
     return read_json_from_file(PLAYER_META_PATH)
 
 
-def read_cdda_info_from_disk():
-    """ wrapper for reading the cdda info dict
+def read_cdda_meta_from_disk():
+    """ wrapper for reading the cdda metadata dict from disk
         (dictionary)
     """
 
-    result = read_json_from_file( CDDA_INFO_PATH )
+    result = read_json_from_file( CDDA_META_PATH )
 
     if not result:
-        result = CDDA_INFO_TEMPLATE
+        result = CDDA_META_TEMPLATE.copy()
 
     return result
 
@@ -820,10 +820,10 @@ def read_json_from_file(fpath, timeout=2):
             sleep(period)
 
     if not tries:
-        print(f'{Fmt.RED}(!) Cannot read `{fpath}`{Fmt.END}')
+        print(f'{Fmt.RED}(miscel.py) Cannot read `{fpath}`{Fmt.END}')
 
     elif not d:
-        print(f'{Fmt.RED}(i) Void JSON in `{fpath}`{Fmt.END}')
+        print(f'{Fmt.RED}(miscel.py) Void JSON in `{fpath}`{Fmt.END}')
 
     return d
 
@@ -1060,9 +1060,12 @@ def time_diff(t1, t2):
     return s2 - s1
 
 
-def sec2min(s, mode=''):
-    """ Format a given float (seconds) to "MMmSSs"
-        or to "MM:SS" if mode == ':'
+def time_sec2mmss(s, mode=':'):
+    """ Format a given float (seconds)
+
+        to      "MM:SS"
+        or to   "MMmSSs"    if mode != ':'
+
         (string)
     """
     m = int(s // 60)
@@ -1075,7 +1078,7 @@ def sec2min(s, mode=''):
         return f'{str(m).rjust(2,"0")}m{str(s).rjust(2,"0")}s'
 
 
-def timesec2string(x):
+def time_sec2hhmmss(x):
     """ Format a given float (seconds) to "hh:mm:ss"
         (string)
     """
@@ -1087,7 +1090,7 @@ def timesec2string(x):
     return f'{h:0>2}:{m:0>2}:{s:0>2}'
 
 
-def msec2str(msec=0, string=''):
+def time_msec2mmsscc(msec=0, string=''):
     """ Convert milliseconds <--> string MM:SS.CC
 
         Give me only one parameter: number or string

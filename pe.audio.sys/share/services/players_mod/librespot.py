@@ -17,7 +17,7 @@ UHOME = os.path.expanduser("~")
 MAINFOLDER = f'{UHOME}/pe.audio.sys'
 
 sys.path.append(f'{MAINFOLDER}/share/miscel')
-from miscel import sec2min
+from miscel import time_sec2mmss, Fmt
 
 
 def librespot_control(cmd, arg=''):
@@ -133,10 +133,10 @@ def librespot_meta(md):
                 if '"DURATION_MS"' in line:
                     envvars = '{' + line.split('{')[1]
                     dur_ms = float(json.loads(envvars)["DURATION_MS"])
-                    md['time_tot'] = sec2min(dur_ms/1000)
+                    md['time_tot'] = time_sec2mmss(dur_ms/1000)
 
-    except:
-        pass
+    except Exception as e:
+        print(f'{Fmt.RED}(librespot.py) {str(e)}{Fmt.END}')
 
 
     return md

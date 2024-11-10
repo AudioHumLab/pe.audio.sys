@@ -18,8 +18,7 @@ import  sys
 UHOME = os.path.expanduser("~")
 sys.path.append(f'{UHOME}/pe.audio.sys/share/miscel')
 
-from    config  import MAINFOLDER
-from    miscel  import timesec2string as timeFmt
+from    miscel  import MAINFOLDER, time_sec2mmss, Fmt
 
 
 # (i) AUDIO FORMAT IS HARDWIRED pending on how to retrieve it from the desktop client.
@@ -230,14 +229,14 @@ def spotify_meta(md):
         md['track_num'] = tmp["xesam:trackNumber"]
 
         # time lenght:
-        md['time_tot'] = timeFmt( tmp["mpris:length"] / 1e6 )
+        md['time_tot'] = time_sec2mmss( tmp["mpris:length"] / 1e6 )
 
         # loaded file
         md["file"] = tmp["mpris:trackid"]
         #md["file"] = tmp["xesam:url"]
 
-    except:
-        pass
+    except Exception as e:
+        print(f'{Fmt.RED}(spotify_desktop.py) {str(e)}{Fmt.END}')
 
     return md
 

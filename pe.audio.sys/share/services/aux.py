@@ -83,6 +83,9 @@ def get_sysmon(w_iface='wlan0'):
 
         d = {}
 
+        if not WIFI_DETECTED:
+            return d
+
         try:
             tmp = sp.check_output(f'iwconfig {iface}'.split()).decode().split()
 
@@ -96,7 +99,7 @@ def get_sysmon(w_iface='wlan0'):
                     d[k] = v
 
         except Exception as e:
-            print( str(e) )
+            print(f'(aux.py) get_wifi {str(e)}' )
 
         return d
 
@@ -529,7 +532,26 @@ class files_event_handler(FileSystemEventHandler):
 # auto-started when loading this module
 def init():
 
-    global AUX_INFO
+    def wifi_detect():
+
+        try:
+            tmp = sp.check_output(f'ifconfig'.split()).decode().split()
+            if 'wlan' in tmp:
+                print(f'{Fmt.GREEN}(aux.py) wifi detected{Fmt.END}')
+                return True
+            else:
+                print(f'{Fmt.GRAY}(aux.py) wifi NOT detected{Fmt.END}')
+                return False
+
+        except Exception as e:
+            print(f'(aux.py) wifi_detect {str(e)}' )
+            return False
+
+
+    global AUX_INFO, WIFI_DETECTED
+
+    WIFI_DETECTED = wifi_detect()
+
     AUX_INFO = {    'amp':                  'off',
                     'loudness_monitor':     0.0,
                     'last_macro':           '',

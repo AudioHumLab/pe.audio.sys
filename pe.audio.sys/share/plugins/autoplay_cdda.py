@@ -14,8 +14,9 @@
 
 import  os
 import  sys
-from    time    import sleep
 import  pyudev
+from    time        import sleep
+from    socket      import gethostname
 from    subprocess  import check_output, Popen, run
 
 UHOME = os.path.expanduser("~")
@@ -59,7 +60,7 @@ def load_CDDA():
     if 'mpd' in CONFIG['sources']['cd']['jack_pname']:
         run('mpc clear'.split())
         run('mpc consume off'.split())
-        run('mpc load cdda'.split())
+        run(f'mpc load cdda_{gethostname()}'.split())
 
     send_cmd( 'player pause', sender=ME, verbose=True )
     send_cmd( 'aux warning clear', sender=ME, verbose=True, timeout=1 )

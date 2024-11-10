@@ -24,7 +24,7 @@ from config import  STATE_PATH, CONFIG, EQ_FOLDER, EQ_CURVES, TONE_MEMO_PATH, \
                     LSPK_FOLDER, LDMON_PATH, MAINFOLDER
 
 from miscel import  read_state_from_disk, read_json_from_file, get_peq_in_use, \
-                    sec2min, Fmt, calc_gain
+                    time_sec2mmss, Fmt, calc_gain
 
 USE_AMIXER = False
 try:
@@ -121,7 +121,7 @@ def powersave_loop( convolver_off_driver, convolver_on_driver,
         # No level detected
         if dBFS < NOISE_FLOOR and lowSigElapsed >= MAX_WAIT:
             if bf.is_running():
-                print(f'(powersave) low level during {sec2min(MAX_WAIT)}, '
+                print(f'(powersave) low level during {time_sec2mmss(MAX_WAIT, mode="__m__s")}, '
                        'requesting to stop Brutefir' )
                 convolver_off_driver.set()
 

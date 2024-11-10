@@ -17,9 +17,9 @@ UHOME = os.path.expanduser("~")
 sys.path.append(f'{UHOME}/pe.audio.sys/share/miscel')
 sys.path.append( os.path.dirname(__file__) )
 
-from miscel import timesec2string as timeFmt, sec2min, Fmt,     \
-                   read_mpd_config, read_cdda_info_from_disk,   \
-                   METATEMPLATE
+from miscel import time_sec2hhmmss, time_sec2mmss, Fmt,     \
+                   read_mpd_config, read_cdda_meta_from_disk,   \
+                   PLAYER_METATEMPLATE
 
 MPD_PORT                = read_mpd_config()["port"]
 CDDA_MPD_PLAYLIST_PATH  = f'{UHOME}/pe.audio.sys/.cdda_mpd_playlist'
@@ -45,7 +45,7 @@ def ping_mpd():
 
         try:
             print(f'{Fmt.GRAY}(mpd_mod.py) Trying to connect ... .. .{Fmt.END}')
-            c.connect('localhost', MPD_PORT)
+            c.connect('localhost', MPD_PORT, timeout=30)
             print(f'{Fmt.BLUE}(mpd_mod.py) Connected to MPD{Fmt.END}')
             sleep(.1)
             return True
@@ -77,6 +77,29 @@ def mpd_cdda_in_playlist(all_or_any='any'):
         return all( [ 'cdda:/' in x for x in pl ] )
 
 
+def mpd_get_cd_track_nums():
+    """ special use for CD
+    """
+
+    result = []
+
+    if not ping_mpd():
+        print(f'{Fmt.RED}(mpd_mod.py) mpd_get_cd_track_nums not connected to MPD{Fmt.END}')
+        return result
+
+    if mpd_cdda_in_playlist('all'):
+        result = c.playlist()
+
+    # ['file: cdda://dev/cdrom/1',
+    #  'file: cdda://dev/cdrom/2',
+    #  ... ]
+
+    result = [ x.split('/')[-1] for x in result ]
+    # ['1', '2', '3' , ... ]
+
+    return result
+
+
 def mpd_playlist():
 
     result = []
@@ -85,8 +108,20 @@ def mpd_playlist():
         print(f'{Fmt.RED}(mpd_mod.py) mpd_playlist not connected to MPD{Fmt.END}')
         return result
 
-    if mpd_cdda_in_playlist('all'):
-        result = c.playlist()
+
+    try:
+        tmp = c.playlistid()
+
+        if mpd_cdda_in_playlist('all'):
+            print(f'{Fmt.BLUE}(mpd_mod.py) mpd_playlist is a CD playlist{Fmt.END}')
+            result = [ f'{int(x["pos"]) + 1}. {x["name"]}' for x in tmp ]
+
+        else:
+            print(f'{Fmt.RED}(mpd_mod.py) mpd_playlist is NOT a CD playlist{Fmt.END}')
+            result = [ x["title"] for x in tmp ]
+
+    except Exception as e:
+        print(f'{Fmt.RED}(mpd_mod.py) mpd_playlist {str(e)}{Fmt.END}')
 
     return result
 
@@ -119,8 +154,13 @@ def mpd_playlists(cmd, arg=''):
 
     elif cmd == 'clear_playlist':
 
-        c.clear()
-        result = 'playlist cleared'
+        try:
+            c.clear()
+            sleep(.2)
+            result = 'playlist cleared'
+        except Exception as e:
+            result = f'{str(e)}'
+
 
     return result
 
@@ -216,7 +256,7 @@ def mpd_control( cmd, arg='', port=MPD_PORT ):
             return 'stop'
 
 
-def mpd_meta( md=METATEMPLATE.copy() ):
+def mpd_meta( md=PLAYER_METATEMPLATE.copy() ):
     """ Comuticates to MPD music player daemon
         Input:      blank metadata dict
         Return:     track metadata dict
@@ -301,22 +341,22 @@ def mpd_meta( md=METATEMPLATE.copy() ):
 
     if 'time' in st:
         # time is given as a string 'current:total', each part in seconds
-        md["time_pos"] = sec2min( int( st["time"].split(':')[0] ), mode=':')
-        md["time_tot"] = sec2min( int( st["time"].split(':')[1] ), mode=':')
+        md["time_pos"] = time_sec2mmss( int( st["time"].split(':')[0] ))
+        md["time_tot"] = time_sec2mmss( int( st["time"].split(':')[1] ))
 
 
     # Special case CD audio we need to read artist and album
-    # from the .cdda_info file previously saved to disk
+    # from the .cdda_metadata file previously saved to disk
     if 'file' in cs and 'cdda:/' in cs["file"]:
 
         curr_cd_track =  cs["file"].split('/')[-1]
 
-        cdda_info = read_cdda_info_from_disk()
+        cdda_meta = read_cdda_meta_from_disk()
 
-        md["artist"]    = cdda_info["artist"]
-        md["album"]     = cdda_info["album"]
+        md["artist"]    = cdda_meta["artist"]
+        md["album"]     = cdda_meta["album"]
         md["track_num"] = curr_cd_track
-        md["title"]     = cdda_info["tracks"][curr_cd_track]["title"]
+        md["title"]     = cdda_meta["tracks"][curr_cd_track]["title"]
 
 
     return md

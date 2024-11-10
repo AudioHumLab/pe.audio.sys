@@ -48,7 +48,7 @@ AUX_INFO_PATH       = f'{MAINFOLDER}/.aux_info'
 AMP_STATE_PATH      = f'{UHOME}/.amplifier'
 
 PLAYER_META_PATH    = f'{MAINFOLDER}/.player_metadata'
-METATEMPLATE        = { 'player':       '',
+PLAYER_METATEMPLATE = { 'player':       '',
                         'time_pos':     '',
                         'time_tot':     '',
                         'bitrate':      '',
@@ -61,12 +61,12 @@ METATEMPLATE        = { 'player':       '',
                         'tracks_tot':   ''
                       }
 
-CDDA_INFO_PATH      = f'{MAINFOLDER}/.cdda_info'
-# cdda info template with a fake track #1
-CDDA_INFO_TEMPLATE = { 'discid': '', 'artist': '', 'album': '',
-                       'tracks': { '1': {'title': '', 'length': '00:00.00'}
-                       }
-                     }
+
+CDDA_MUSICBRAINZ_PATH = f'{UHOME}/pe.audio.sys/.cdda_musicbrainz'
+CDDA_META_PATH        = f'{MAINFOLDER}/.cdda_metadata'
+CDDA_META_TEMPLATE    = { 'discid': '', 'artist': '', 'album': '',
+                          'tracks': { }
+                        }
 
 
 def _init():
