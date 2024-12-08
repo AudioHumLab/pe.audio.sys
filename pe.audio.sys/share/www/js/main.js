@@ -9,7 +9,6 @@
        NOTICE: remember do not leaving any console.log active
 */
 
-
 //////// CONFIGURABLE ITEMS ////////
 //
 //  (i) Set URL_PREFIX ='/' if you use the provided nodejs/www_server.js script,
@@ -128,7 +127,6 @@ function fill_in_page_statics(){
             }
         }
 
-
         // standard: main selector as INPUTS manager
         if ( main_sel_mode == 'inputs' ){
             document.getElementById("mainSelector").title = 'Source Selector';
@@ -142,6 +140,7 @@ function fill_in_page_statics(){
             fill_in_main_as_macros();
         }
     }
+
 
     function fill_in_xo_selector() {
         try{
@@ -232,7 +231,7 @@ function manage_main_cside(){
     if (aux_info.warning !== ''){
         main_cside_msg = aux_info.warning;
     }else if (state.convolver_runs==false){
-        main_cside_msg = '( sleeping )';
+        main_cside_msg = state.loudspeaker + ' ( sleeping )';
     }else{
         if (hold_cside_msg > 0){
             hold_cside_msg -= 1;
@@ -271,13 +270,21 @@ function init(){
 
 
     function get_web_config(){
+
         try{
             web_config      = JSON.parse( control_cmd('aux get_web_config') );
-            main_sel_mode   = web_config.main_selector;
+
+            if (document.body.getAttribute('data-layout') == 'landscape'){
+                main_sel_mode = 'macros'
+            }else{
+                main_sel_mode = web_config.main_selector;
+            }
+
             mFnames         = web_config.user_macros;
             if (web_config.show_graphs==false){
                 document.getElementById( "bt_toggle_eq_graphs").style.display = "none";
             }
+
         }catch(e){
             console.log('response error to \'aux get_web_config\'', e.message);
         }
@@ -1142,6 +1149,7 @@ function ck_display_advanced(mode) {
         document.getElementById("format_file").style.display = "table-row";
         document.getElementById("div_advanced_controls").style.display = "block";
         document.getElementById("main_lside").style.display = "table-cell";
+        document.getElementById("landscape").style.display = "table-cell";
         document.getElementById("sysmon").style.display = "table-cell";
         document.getElementById("SoloInfo").style.display = "table-cell";
         document.getElementById("PolarityInfo").style.display = "table-cell";
@@ -1154,6 +1162,7 @@ function ck_display_advanced(mode) {
         document.getElementById("format_file").style.display = "none";
         document.getElementById("div_advanced_controls").style.display = "none";
         document.getElementById("main_lside").style.display = "none";
+        document.getElementById("landscape").style.display = "none";
         document.getElementById("sysmon").style.display = "none";
         document.getElementById("SoloInfo").style.display = "none";
         document.getElementById("PolarityInfo").style.display = "none";

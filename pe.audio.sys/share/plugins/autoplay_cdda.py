@@ -22,7 +22,7 @@ from    subprocess  import check_output, Popen, run
 UHOME = os.path.expanduser("~")
 sys.path.append(f'{UHOME}/pe.audio.sys/share/miscel')
 
-from    miscel  import send_cmd, get_macros, USER, CONFIG
+from    miscel  import send_cmd, USER, CONFIG
 from    cdda    import dump_cdda_metadata
 
 

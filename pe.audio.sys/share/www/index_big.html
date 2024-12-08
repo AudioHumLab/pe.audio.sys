@@ -3,7 +3,6 @@
 <html lang="en">
 
 <head>
-
     <meta charset="utf-8">
     <title>pe.audio.sys</title>
 
@@ -33,16 +32,17 @@
 
 
     <!-- The JAVASCRIPT functions used when an event occurs on this page body's -->
-    <script src="./js/main.js"></script>
+    <script defer src="./js/main.js"></script>
 
 
-    <!-- CSS Styles -->
+    <!-- CSS Styles   styles_big.css NOT IN USE -->
     <link rel="stylesheet" href="./css/styles.css">
 
 </head>
 
 <!-- init() initializes the page and schedules periodic updates -->
-<body onload="init()">
+<!--                              `landscape` layout overrides the main_selector web_config mode -->
+<body onload="init()" data-layout="landscape">
 
     <!-- :: pe.audio.sys :: Loudspeaker | advanced_controls_switch -->
     <div>
@@ -56,10 +56,16 @@
             <td id="main_cside">
             </td>
             <td id="main_rside">
-                <button id="advanced_switch" title="advanced controls" style="font-size:0.7em" onclick="ck_display_advanced('toggle')">&#9881;</button>
+                <button id="advanced_switch" title="advanced controls" style="font-size:0.7em" onclick="ck_display_advanced('toggle')">
+                    &#9881;
+                </button>
             </td>
         </tr>
         <tr>
+            <td id="landscape"  title="NORMAL" style="display:none">
+                <!--- 128241 mobile phone, 9611 vertical rectangle -->
+                <a href="/index.html" style="color:white;text-decoration-line:none">&#9611;</a>
+            </td>
             <td id="sysmon" colspan="3" style="display:none"></td>
         </tr>
     </table>
@@ -76,7 +82,7 @@
             </td>
 
             <!-- LEVEL display -->
-            <td id="levelInfo" rowspan="2" title="Target volume">
+            <td id="levelInfo" rowspan="2" title="Target volume" style="font-size:2.0em">
             </td>
 
             <!-- LOUDNESS control -->
@@ -145,7 +151,7 @@
                         SUBS.
                 </button>
             </td>
-            <td id="level_buttons12">
+            <td id="level_buttons12" style="font-size:1.5em">
                 <button type="button" onmousedown="omd_audio_change('level', -1)" >
                         &nbsp;-1&nbsp;</button>
                 <button type="button" onmousedown="omd_mute_toggle()" id="bt_mute" >
@@ -169,7 +175,7 @@
                         TONE DEF
                 </button>
             </td>
-            <td id="level_buttons22">
+            <td id="level_buttons22" style="font-size:1.5em">
                 <button type="button" onmousedown="omd_audio_change('level', -3)" >
                         &nbsp;&nbsp;&nbsp;-3&nbsp;&nbsp;&nbsp;</button>
                 <button type="button" onmousedown="omd_audio_change('level', +3)" >
@@ -300,7 +306,7 @@
         <tr>
             <td id="bitrate"></td>
             <td id="track_info"></td>
-            <td id="artist"></td>
+            <td id="artist" style="font-size:1.5em"></td>
             <td id="time"></td>
         </tr>
         <tr id="format_file" style="display:none">
@@ -308,10 +314,10 @@
             <td id="file"   colspan="3"></td>
         </tr>
         <tr>
-            <td id="album" colspan="4"></td>
+            <td id="album" colspan="4" style="font-size:1.5em"></td>
         </tr>
         <tr>
-            <td id="title" colspan="4"></td>
+            <td id="title" colspan="4" style="font-size:1.5em"></td>
         </tr>
       </table>
     </div>
@@ -322,7 +328,7 @@
         <tr> <!-- row1 -->
             <td id="playback_control_11">
             </td>
-            <td id="playback_control_12" >
+            <td id="playback_control_12" style="font-size:1.5em">
                 <button type="button" id="bt_prev" onmousedown="omd_playerCtrl('previous')" >&lt;|           </button>
                 <button type="button" id="bt_rew"      onmousedown="omd_playerCtrl('rew')"      >&lt;&lt;        </button>
                 <button type="button" id="bt_ff"       onmousedown="omd_playerCtrl('ff')"       >&gt;&gt;        </button>
@@ -339,7 +345,7 @@
         <tr> <!-- row2 -->
             <td id="playback_control_21" >
             </td>
-            <td id="playback_control_22" >
+            <td id="playback_control_22" style="font-size:1.5em">
                 <button type="button" id="bt_eject"    onmousedown="omd_playerCtrl('eject')"    >&nbsp;^&nbsp;   </button>
                 <button type="button" id="bt_stop"     onmousedown="omd_playerCtrl('stop')"     >&nbsp;[]&nbsp;  </button>
                 <button type="button" id="bt_pause"    onmousedown="omd_playerCtrl('pause')"    >&nbsp;||&nbsp;  </button>
@@ -359,7 +365,7 @@
     <!-- MACRO BUTTONS can be toggled -->
     <!-- Nx3 buttons keypad for customizable user macros -->
     <div>
-      <table id="macro_buttons" style="display:inline-table">
+      <table id="macro_buttons" style="display:none">
       </table>
     </div>
 

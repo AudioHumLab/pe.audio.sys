@@ -44,6 +44,7 @@
     td#main_cside       { width:  90%; text-align: center; border: 1px solid white; border-radius: 10px/10px; }
     td#main_rside       { width:   5%; text-align: center; border: none; }
 
+    td#landscape        { width:   5%; text-align: center; border: none; }
     td#sysmon           { width: 100%; border: 1px solid grey; border-radius: 10px/10px; }
 
     td#OnOff            { width: 10%; text-align: center; border: none; }

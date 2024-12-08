@@ -28,7 +28,7 @@ from    miscel  import  read_state_from_disk, read_metadata_from_disk, \
 def main_loop():
 
     def eject_job(timer=3):
-        """ Runs forever every <time> sec: reads the playback files
+        """ Runs forever every <timer> sec: reads the playback files
             to detect when a CD disc is over, then ejects the disc.
         """
 
