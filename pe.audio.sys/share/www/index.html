@@ -142,7 +142,6 @@
     <!-- LEVEL butttons -->
     <div id="level_buttons" >
         <table id="level_buttons_table">
-          <tr>
             <td id="level_buttons11">
                 <button type="button" id="bt_subsonic" style="display:none;font-size:0.7em"
                         title="Subsonic Filter"
@@ -186,6 +185,18 @@
                         onmousedown="omd_delay_toggle()">
                         0 ms
                 </button>
+            </td>
+          </tr>
+          <tr id="extra_row">
+            <td id="extra_buttons11">
+                <button type="button" id="bt_compressor" style="display:none;font-size:0.7em"
+                        title="Compressor"
+                        onmousedown="control_cmd('preamp compressor rotate')">
+                        COMP.
+                </button>
+            <td id="extra_buttons12">
+            </td>
+            <td id="extra_buttons13">
             </td>
           </tr>
         </table>

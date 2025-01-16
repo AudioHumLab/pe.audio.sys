@@ -11,7 +11,7 @@ import  sys
 import  mpd
 from    time        import sleep
 import  json
-from    subprocess  import Popen
+from    subprocess  import Popen, run
 
 UHOME = os.path.expanduser("~")
 sys.path.append(f'{UHOME}/pe.audio.sys/share/miscel')
@@ -131,7 +131,7 @@ def mpd_playlists(cmd, arg=''):
     result = ''
 
     if not ping_mpd():
-        print(f'{Fmt.RED}(mpd_mod.py) mpd_playlists not connected to MPD{Fmt.END}')
+        print(f'{Fmt.RED}(mpd_mod.py) mpd_playlists: not connected to MPD{Fmt.END}')
         return result
 
     if cmd == 'get_playlists':
@@ -139,6 +139,8 @@ def mpd_playlists(cmd, arg=''):
         # Some setups could use a mount for mpdconf playlist_directory
         try:
             result = [ x['playlist'] for x in c.listplaylists() ]
+
+        # [52@0] {listplaylists} Failed to open /mnt/qnas/media/playlists/: No such file or directory
         except Exception as e:
             print(f'{Fmt.RED}(mpd_mod.py) error with `{cmd}` {str(e)}{Fmt.END}')
 

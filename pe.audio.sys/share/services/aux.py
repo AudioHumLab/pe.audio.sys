@@ -168,10 +168,18 @@ def get_web_config():
     wconfig['LU_monitor_enabled'] = True if 'loudness_monitor.py' \
                                               in CONFIG['plugins'] else False
 
+    # Optional compressor
+    wconfig["use_compressor"] = True if CONFIG["use_compressor"] else False
+
     return wconfig
 
 
 def run_macro(mname):
+
+    if not mname or 'clear_last' in mname:
+
+        AUX_INFO["last_macro"] = ''
+        return 'last_macro cleared'
 
     if mname in get_macros():
 

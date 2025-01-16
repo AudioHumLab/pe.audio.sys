@@ -482,7 +482,7 @@ if __name__ == "__main__":
 
     # RUN THE 'peaudiosys' SERVER
     manage_server(mode='start', service='peaudiosys')
-    if not server_is_running(who_asks='start'):
+    if not peaudiosys_server_is_running():
         print(f'{Fmt.BOLD}(start) PANIC: \'peaudiosys\' service is down. Bye.{Fmt.END}')
         sys.exit()
 

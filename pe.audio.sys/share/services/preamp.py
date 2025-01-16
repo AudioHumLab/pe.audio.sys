@@ -13,10 +13,11 @@ from    os.path             import expanduser
 UHOME = expanduser("~")
 sys.path.append(f'{UHOME}/pe.audio.sys/share/miscel')
 
-from    config              import  CONFIG
-from    preamp_mod.core     import  Preamp, Convolver
-from    miscel              import  get_remote_zita_params, \
-                                    remote_zita_restart
+from    config                  import  CONFIG
+from    miscel                  import  get_remote_zita_params, \
+                                        remote_zita_restart
+from    preamp_mod.core         import  Preamp, Convolver
+import  camilla_dsp             as      cdsp
 
 # INITIATE A PREAMP INSTANCE
 preamp = Preamp()
@@ -26,6 +27,14 @@ preamp.save_state()
 
 # INITIATE A CONVOLVER INSTANCE (XO and DRC management)
 convolver = Convolver()
+
+# INITIATE CamillaDSP (currently only used for an optional compressor)
+if CONFIG["use_compressor"]:
+    cdsp._init()
+    if cdsp.compressor('get')["active"]:
+        preamp.state["compressor"] = cdsp.compressor('get')["parameters"]["ratio"]
+    else:
+        preamp.state["compressor"] = 'off'
 
 
 # Interface function for this module
@@ -112,6 +121,43 @@ def do( cmd, argstring ):
         return result
 
 
+    def manage_compressor(x, *dummy):
+
+        x = x.split()
+        oper = arg = ''
+        if x:
+            oper = x[0]
+            if x[1:]:
+                arg = x[1]
+
+        if not oper:
+            if not 'compressor' in preamp.state:
+                preamp.state["compressor"] = 'off'
+            return preamp.state["compressor"]
+
+        # Proceed and get the result
+        tmp = cdsp.compressor(oper, arg)
+
+        # Not a valid result
+        if type(tmp) == str:
+            res = tmp
+
+        # a valid result
+        else:
+            active     = tmp["active"]
+            parameters = tmp["parameters"]
+
+            if active:
+                res = parameters["ratio"]
+                preamp.state["compressor"] = res
+
+            else:
+                res = 'off'
+                preamp.state["compressor"] = res
+
+        return res
+
+
     def print_help(*dummy):
         return open(f'{UHOME}/pe.audio.sys/doc/peaudiosys.hlp', 'r').read()
 
@@ -160,6 +206,8 @@ def do( cmd, argstring ):
             'set_xo':           set_xo,
             'xo':               set_xo,
             'add_delay':        add_delay,
+
+            'compressor':       manage_compressor,
 
             'convolver':        preamp.switch_convolver,
             'powersave':        preamp.powersave,

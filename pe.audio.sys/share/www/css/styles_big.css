@@ -73,6 +73,9 @@
 
 
     table#level_buttons_table  { }
+    td#extra_buttons11   { border-style: none; width:18%; }
+    td#extra_buttons12   { border-style: none; width:18%; }
+    td#extra_buttons13   { border-style: none; width:18%; }
     td#level_buttons11   { border-style: none; width:18%; }
     td#level_buttons12   { border-style: none; width:64%; }
     td#level_buttons13   { border-style: none; width:18%; }

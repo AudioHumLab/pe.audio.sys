@@ -14,7 +14,7 @@
 # .player_metadata  'w'     Stores the current player metadata
 #
 
-from    os.path     import expanduser
+import  os
 import  sys
 import  threading
 from    socket      import gethostname
@@ -23,11 +23,12 @@ import  json
 from    subprocess  import Popen, run
 
 
-UHOME = expanduser("~")
+UHOME = os.path.expanduser("~")
 sys.path.append(f'{UHOME}/pe.audio.sys/share/miscel')
 
 
-from  config                        import  CONFIG, PLAYER_META_PATH,   \
+from  config                        import  CONFIG, MAINFOLDER,         \
+                                            PLAYER_META_PATH,           \
                                             PLAYER_METATEMPLATE,        \
                                             CDDA_META_PATH,             \
                                             CDDA_META_TEMPLATE
@@ -72,21 +73,35 @@ def clear_cdda_stuff():
 
         # Clearing MPD cd playlist
         if mpd_cdda_in_playlist(all_or_any='any'):
-            print(f'{Fmt.MAGENTA}(players.py) Clearing MPD playlist{Fmt.END}')
+            print(f'{Fmt.GRAY}(players.py) Clearing MPD playlist{Fmt.END}')
             run( 'mpc stop'.split()  )
             sleep(.2)
             run( 'mpc clear'.split() )
             sleep(1)
 
         # blank pe.audio.sys/.cdda_metadata
-        print(f'{Fmt.MAGENTA}(players.py) clearing `{CDDA_META_PATH}`{Fmt.END}')
+        print(f'{Fmt.GRAY}(players.py) clearing `{CDDA_META_PATH}`{Fmt.END}')
         with open(CDDA_META_PATH, 'w') as f:
             f.write( json.dumps(CDDA_META_TEMPLATE.copy()) )
 
         # delete MPD cdda playlist files (M3U/PLS)
-        fname = f'{ read_mpd_config()["playlist_directory"] }/cdda_*'
-        print(f'{Fmt.MAGENTA}(players.py) clearing {fname}{Fmt.END}')
-        Popen( f'rm -f {fname}', shell=True )
+        MPD_PL_DIR  = read_mpd_config()["playlist_directory"]
+
+        if not os.path.isdir( MPD_PL_DIR ):
+
+            msg = f'directory NOT available `{MPD_PL_DIR}`, fallback to `~/.config/mpd/playlists`'
+            print(f'{Fmt.BOLD}(players.py) {msg}{Fmt.END}')
+
+            send_cmd(f'aux warning clear', verbose=True, timeout=1)
+            send_cmd(f'aux warning set {msg}', verbose=True, timeout=1)
+
+            MPD_PL_DIR  = f'{UHOME}/.config/mpd/playlists'
+
+        CD_PL_PATH = f'{MPD_PL_DIR}/cdda_*'
+
+        print(f'{Fmt.GRAY}(players.py) clearing `{CD_PL_PATH}`{Fmt.END}')
+        Popen( f'rm -f {CD_PL_PATH}', shell=True )
+
 
 
 def remote_get_meta(host, port=9990):

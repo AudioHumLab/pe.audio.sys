@@ -10,20 +10,22 @@ https://github.com/AudioHumLab/FIRtro/wiki
 
 The main software on which this project is based:
 
-- The **Brutefir** convolver which incorporates a real time equalizer module https://torger.se/anders/brutefir.html
+- XOVER filtering, DRC and soft EQ: the **Brutefir** convolution engine https://torger.se/anders/brutefir.html
 
-- Audio connections are based on **JACK** https://jackaudio.org
+- Audio connections: **JACK** https://jackaudio.org
 
 
 Other GNU audio software we use here:
 
-- IIR filtering plugins are supported by **Ecasound**.
-
-- Networked audio and IIR filtering are based on Fons Adriaensen utilities https://kokkinizita.linuxaudio.org/linuxaudio/
+- [CamillaDSP](https://github.com/HEnquist/camilladsp), currently used for some EQ purposes.
+  
+- Networked audio and IIR filtering are based on **Fons Adriaensen** utilities https://kokkinizita.linuxaudio.org/linuxaudio
 
 - For music files library playing we use **MPD** (Music Player Daemon)
 
 - For CD, DVB-T (digital terrestial radio broadcasting) or internet streamed music we use **Mplayer**
+
+- Former IIR filtering plugins were supported by **Ecasound** (obsolete currently)
 
 
 Most of the system is written in Python3, and config files are YAML kind of, thanks @rripio.

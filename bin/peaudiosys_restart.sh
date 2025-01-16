@@ -7,7 +7,7 @@
 
 # Python venv
 if [[ ! $VIRTUAL_ENV ]]; then
-    source /home/paudio/.env/bin/activate 1>/dev/null 2>&1
+    source "$HOME"/.env/bin/activate 1>/dev/null 2>&1
 fi
 
 
@@ -34,7 +34,7 @@ function do_start {
     c=1
     while [[ $c -le $tries ]]; do
 
-        echo "try #"$c" "$(date) > $HOME/pe.audio.sys/log/peaudiosys_restart_tries.log
+        echo "$(date +%Y-%m-%dT%H:%M:%S)"" try #"$c >> $HOME/pe.audio.sys/log/peaudiosys_restart_tries.log
         echo '(i) RESTARTING pe.audio.sys (all printouts hidden to /dev/null)'
         echo '    Startup process logged in <pe.audio.sys/log/start.log>'
         $HOME/pe.audio.sys/start.py all --log 1>/dev/null 2>&1 &

@@ -1,0 +1,52 @@
+---
+devices:
+
+  samplerate: 44100
+  chunksize: 1024
+
+  capture:
+    type: Jack
+    channels: 2
+    device: default
+
+  playback:
+    type: Jack
+    channels: 2
+    device: default
+
+processors:
+  tv_compressor:
+    type: Compressor
+    parameters:
+      channels: 2
+      attack: 0.025
+      release: 1.0
+      threshold: -60
+      factor: 3.0
+      makeup_gain: 30.1
+      clip_limit: 0.0
+      soft_clip: true
+
+mixers:
+  stereo:
+    channels:
+      in: 2
+      out: 2
+    mapping:
+      - dest: 0
+        sources:
+          - channel: 0
+            gain: 0
+            inverted: false
+      - dest: 1
+        sources:
+          - channel: 1
+            gain: 0
+            inverted: false
+
+pipeline:
+  - type: Mixer
+    name: stereo
+  - type: Processor
+    name: tv_compressor
+    bypassed: true

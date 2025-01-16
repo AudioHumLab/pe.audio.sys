@@ -56,10 +56,10 @@ def get_bf_eq():
             s.connect( ('localhost', 3000) )
             s.send( f'{cmd}; quit;\n'.encode() )
             while True:
-                tmp = s.recv(1024).decode()
+                tmp = s.recv(1024)
                 if not tmp:
                     break
-                ans += tmp
+                ans += tmp.decode()
             s.close()
         except:
             print( f'(brutefir_eq2png) unable to connect to Brutefir:3000' )

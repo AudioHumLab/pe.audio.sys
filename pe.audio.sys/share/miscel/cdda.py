@@ -12,8 +12,8 @@ import  json
 import  sys
 import  os
 from    socket import gethostname
-from    miscel import CONFIG, CDDA_META_PATH, CDDA_META_TEMPLATE,   \
-                      CDDA_MUSICBRAINZ_PATH,                        \
+from    miscel import CONFIG, MAINFOLDER, CDDA_META_PATH,           \
+                      CDDA_META_TEMPLATE, CDDA_MUSICBRAINZ_PATH,    \
                       Fmt, time_msec2mmsscc, read_mpd_config
 
 try:
@@ -23,11 +23,7 @@ except Exception as e:
     print(f'{Fmt.BOLD}{Fmt.BLINK}Have you activated your Python Virtual Environment?{Fmt.END}')
 
 
-UHOME = os.path.expanduser("~")
-
-MPD_M3U_PATH = f'{ read_mpd_config()["playlist_directory"] }/cdda_{gethostname()}.m3u'
-MPD_PLS_PATH = f'{ read_mpd_config()["playlist_directory"] }/cdda_{gethostname()}.pls'
-
+# CDROM device
 if 'cdrom_device' in CONFIG:
     CDROM_DEVICE = CONFIG['cdrom_device']
 else:
@@ -116,8 +112,12 @@ def _get_disc_metadata(device=CDROM_DEVICE):
         mz_result = mz.get_releases_by_discid( disc_obj.id,
                                                includes=['artists', 'recordings']
                                              )
-        with open(CDDA_MUSICBRAINZ_PATH, 'w') as f:
-            f.write( json.dumps( mz_result ) )
+        try:
+            with open(CDDA_MUSICBRAINZ_PATH, 'w') as f:
+                f.write( json.dumps( mz_result ) )
+        except:
+            print(f'{Fmt.RED}(cdda.py) cannot write to {CDDA_MUSICBRAINZ_PATH}{Fmt.END}')
+
         print(f'{Fmt.GRAY}(cdda.py) Full musicbrainz CD data saved to {CDDA_MUSICBRAINZ_PATH}{Fmt.END}')
 
     except Exception as e:
@@ -252,14 +252,18 @@ def _save_cdda_playlist( md={} ):
         return pls
 
 
-    with open(f'{MPD_M3U_PATH}', 'w') as f:
+    MPD_PL_DIR   = read_mpd_config()["playlist_directory"]
+
+    CDDA_M3U_PATH = f'{MPD_PL_DIR}/cdda_{gethostname()}.m3u'
+    CDDA_PLS_PATH = f'{MPD_PL_DIR}/cdda_{gethostname()}.pls'
+
+    with open(f'{CDDA_M3U_PATH}', 'w') as f:
         f.write( make_m3u( md ) )
-    print(f'{Fmt.BLUE}(cdda.py) MPD CD playlist saved to {MPD_M3U_PATH}{Fmt.END}')
+    print(f'{Fmt.BLUE}(cdda.py) MPD CD playlist saved to {CDDA_M3U_PATH}{Fmt.END}')
 
-    with open(f'{MPD_PLS_PATH}', 'w') as f:
+    with open(f'{CDDA_PLS_PATH}', 'w') as f:
         f.write( make_pls( md ) )
-    print(f'{Fmt.BLUE}(cdda.py) MPD CD playlist saved to {MPD_PLS_PATH}{Fmt.END}')
-
+    print(f'{Fmt.BLUE}(cdda.py) MPD CD playlist saved to {CDDA_PLS_PATH}{Fmt.END}')
 
 
 def dump_cdda_metadata(device=CDROM_DEVICE):
@@ -267,7 +271,8 @@ def dump_cdda_metadata(device=CDROM_DEVICE):
 
             pe.audio.sys/.cdda_metadata
 
-            <MPD_playlists_folder> / cdda_<hostname>.m3u + pls
+            {MPD_playlists_folder}/cdda_{hostname}.m3u
+            {MPD_playlists_folder}/cdda_{hostname}.pls
     """
 
     md = _get_disc_metadata(device)
@@ -280,7 +285,6 @@ def dump_cdda_metadata(device=CDROM_DEVICE):
         print(f'{Fmt.BLUE}(cdda.py) CD metadata saved to {CDDA_META_PATH}{Fmt.END}')
 
         _save_cdda_playlist( md )
-
 
 
 if __name__ == "__main__":

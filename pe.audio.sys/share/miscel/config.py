@@ -29,7 +29,7 @@ from    getpass import getuser
 USER                = getuser()
 UHOME               = os.path.expanduser("~")
 MAINFOLDER          = f'{UHOME}/pe.audio.sys'
-CONFIG              = {}
+CONFIG              = {'use_compressor': False}
 LOUDSPEAKER         = ''
 EQ_CURVES           = {}
 LSPK_FOLDER         = f'{MAINFOLDER}/loudspeakers/{LOUDSPEAKER}'
@@ -62,7 +62,7 @@ PLAYER_METATEMPLATE = { 'player':       '',
                       }
 
 
-CDDA_MUSICBRAINZ_PATH = f'{UHOME}/pe.audio.sys/.cdda_musicbrainz'
+CDDA_MUSICBRAINZ_PATH = f'{MAINFOLDER}/.cdda_musicbrainz'
 CDDA_META_PATH        = f'{MAINFOLDER}/.cdda_metadata'
 CDDA_META_TEMPLATE    = { 'discid': '', 'artist': '', 'album': '',
                           'tracks': { }

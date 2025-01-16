@@ -7,7 +7,7 @@
 
 # Python venv
 if [[ ! $VIRTUAL_ENV ]]; then
-    source /home/paudio/.env/bin/activate 1>/dev/null 2>&1
+    source "$HOME"/.env/bin/activate 1>/dev/null 2>&1
 fi
 
 

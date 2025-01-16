@@ -16,14 +16,21 @@
     This is useful if your sound card cannot run at the same samplerate as
     pe.audio.sys, as mine does (ESI UDJ6 only works at 48 KHz)
 
+    2025-01: librespot suddently crashes, so will use a watchdog here
+
 """
-import sys
-import os
-from subprocess import Popen, call
-from socket import gethostname
-from getpass import getuser
+import  sys
+import  os
+from    subprocess import Popen, call
+from    socket import gethostname
+from    getpass import getuser
+import  threading
+from    time import sleep
 
 UHOME = os.path.expanduser("~")
+sys.path.append(f'{UHOME}/pe.audio.sys/share/miscel')
+
+from miscel import kill_bill
 
 
 # BINARY
@@ -38,6 +45,29 @@ OTHER_OPTS = [
     '--mixer softvol --volume-ctrl fixed --initial-volume 100',
     '--format F32'
 ]
+
+# Current user
+USER = getuser()
+
+
+def run_watchdog():
+
+    def check_librespot_is_running():
+
+        with open('/dev/null', 'w') as fnull:
+
+            # This has a reverse logic :-|
+            if call( ['pgrep', '-u', USER, 'librespot'], stdout=fnull, stderr=fnull ):
+                return False
+            else:
+                return True
+
+    while True:
+
+        if not check_librespot_is_running():
+            start()
+
+        sleep(10)
 
 
 def start():
@@ -54,12 +84,19 @@ def start():
 
     eventsPath = f'{UHOME}/pe.audio.sys/.librespot_events'
 
-    with open(eventsPath, 'w') as f:
+    with open(eventsPath, 'a') as f:
         Popen( cmd.split(), stdout=f, stderr=f )
+
+    job = threading.Thread(target=run_watchdog)
+    job.start()
 
 
 def stop():
-    call( ['pkill', '-u', getuser(), '-KILL', '-f',  'bin/librespot']  )
+
+    # kill previous scripts like this in background
+    kill_bill( os.getpid() )
+
+    call( ['pkill', '-u', USER, '-KILL', '-f',  'bin/librespot']  )
 
 
 if __name__ == "__main__":

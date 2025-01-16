@@ -1,0 +1,7 @@
+#!/bin/bash
+
+python3 $HOME/pe.audio.sys/macros/templates/play_m3u8.py "Radio Clasica" &
+
+control input mpd       1>/dev/null
+
+control lu_offset 9     1>/dev/null

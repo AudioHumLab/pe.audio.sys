@@ -108,4 +108,9 @@ See the `doc/` folder for detailed information about this.
 - Web page includes wifi, temperature and fan speed info.
 - New Brutefir peaks monitor plugin with a dedicated web page `http://<IP>/monitor.html`.
 - Scripts to help while testing a loudspeaker design at `bin/peaudiosys_test/`.
+
+## Jan 2025, version 2.0 beta
+- 1st integration of CamillaDSP, currently only provides the optional compressor, more to coming ;-)
+- New optional compressor useful for watching movies with difficult dialogue dynamics at low listening levels.
+
   

@@ -16,23 +16,29 @@
     If someone modifies the MPD playlist, then this loop will end.
 """
 
+import  psutil
 import  sys
 import  os
 import  yaml
 import  mpd
 import  m3u8
 from    time import sleep
+import  datetime
 
 UHOME = os.path.expanduser("~")
+sys.path.append( f'{UHOME}/pe.audio.sys/share/miscel' )
+
+from miscel import kill_bill
 
 MPD_PORT = 6600
+LOG_PATH = f'{UHOME}/pe.audio.sys/log/play_m3u8.log'
 
-c = mpd.MPDClient()
+mpdcli = mpd.MPDClient()
 
 
 def mpd_connect(port=MPD_PORT):
     try:
-        c.connect('localhost', port)
+        mpdcli.connect('localhost', port)
         return True
     except:
         return False
@@ -45,7 +51,7 @@ def mpd_ping():
     while tries:
 
         try:
-            c.ping()
+            mpdcli.ping()
             return True
         except:
             pass
@@ -93,7 +99,25 @@ def get_url(station_name):
     return url
 
 
+def do_log(msg, to_console=True):
+
+    now = datetime.datetime.now()
+    # ISO timestamp without microseconds:
+    time_stamp = now.isoformat(timespec='seconds')
+
+    with open(LOG_PATH, 'a') as f:
+        f.write(f'{time_stamp} {msg}\n')
+
+    if to_console:
+        print(msg)
+
+
 if __name__ == "__main__":
+
+    # Kills any previous instance of this loop
+    kill_bill( os.getpid() )
+
+    print()
 
     # Reading the desired station
     if not sys.argv[1:]:
@@ -105,70 +129,87 @@ if __name__ == "__main__":
     radio_url = get_url(station_name)
 
     if not radio_url:
-        print(f"'{station_name}': not found. Bye.")
+        do_log(f"'{station_name}': not found. Bye.")
         sys.exit()
+
+    uris = get_m3u8_uris(radio_url)
+
+    number_of_uris = len( uris )
+
+    if not number_of_uris:
+        do_log('Error reading M3U8')
+        sys.exit()
+
+    uri_root = uris[0][: uris[0].rindex('/')]
 
     ts_duration = get_m3u8_target_duration( radio_url )
 
     if not ts_duration:
-        print(f'(play_m3u8.py) {station_name}: not a valid m3u8 url. Bye.')
+        do_log(f'{station_name}: not a valid m3u8 url. Bye.')
         sys.exit()
 
-    # Connecting to MPD
+
+    # Loading the M3U8 into MPD and playing it.
+    do_log(f'Loading `{station_name}` into MPD playlist')
+
     if not mpd_connect():
-        print('(play_m3u8.py) cannot connect to MPD. Bye.')
+        do_log('cannot connect to MPD. Bye.')
         sys.exit()
 
-    c.clear()
-    old_consume = c.status()["consume"]
-    old_random  = c.status()["random"]
-    c.consume(1)
-    c.random(0)
+    mpdcli.clear()
+    old_consume = mpdcli.status()["consume"]
+    old_random  = mpdcli.status()["random"]
+    mpdcli.consume(1)
+    mpdcli.random(0)
 
 
-    # Loading the M3U8 into MPD and playing it
-    number_of_uris = len( get_m3u8_uris(radio_url) )
-    if not number_of_uris:
-        print('(play_m3u8.py) Error reading M3U8')
-        sys.exit()
+    # At least 2 URIs will be kept loaded in the playlist
 
-    loop_waiting = (number_of_uris - 1) * ts_duration
+    loop_waiting = (number_of_uris - 2) * ts_duration
+
     try:
+
+        do_log(f'MPD playing `{station_name}`')
+
+        end_reason = ''
 
         # Repeat every near target duration
         while True:
 
             play_issued = False
 
-            mpd_pl = [ x.split()[-1] for x in c.playlist() ]
+            # Getting the MPD playlits, and discarding the prefix `file: `
+            mpd_pl = [ x.split()[-1] for x in mpdcli.playlist() ]
 
-            # URIs are changing over time
+            # Getting the URIs, which are changing over time
             uris = get_m3u8_uris(radio_url)
 
+            # Exit if someone wants to play anything else
+            if [ uri for uri in mpd_pl if not uri_root in uri ]:
+                end_reason = 'The playing queue was modified'
+                break
+
             for uri in uris:
-
-                # Someone wants to play anything else
-                if len(c.playlist()) > len(uris):
-                    print('(play_m3u8.py) The playing queue was modified, so bye!')
-                    sys.exit()
-
                 if not uri in mpd_pl:
-                    c.add(uri)
+                    mpdcli.add(uri)
 
             if not play_issued:
-                c.play()
+                mpdcli.play()
                 play_issued = True
 
-
             if not mpd_ping():
-                print('(play_m3u8.py) MPD connection lost. Bye.')
-                sys.exit()
+                end_reason = 'MPD connection lost'
+                break
 
             sleep(loop_waiting)
 
+        if end_reason:
+            do_log(f'{end_reason}')
+        else:
+            do_log(f'MPD playlist loop failed :-/')
 
     except KeyboardInterrupt:
-        c.clear()
-        c.consume(old_consume)
-        c.random(old_random)
-        print('\n(play_m3u8.py) Interrupted. Bye!')
+        mpdcli.clear()
+        mpdcli.consume(old_consume)
+        mpdcli.random(old_random)
+        do_log('\nInterrupted. Bye!')

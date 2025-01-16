@@ -325,6 +325,8 @@ powersave:              false
 powersave_noise_floor: -70
 powersave_minutes:      10  # Time in minutes before shutting down Brutefir
 
+# An optional compressor for movies (needs CamillaDSP with JACK backend)
+use_compressor: false
 
 # =========================   AUTO UPDATE (BETA)   ==============================
 # Will add a crontab job in order to auto update from AudioHumLab master branch,

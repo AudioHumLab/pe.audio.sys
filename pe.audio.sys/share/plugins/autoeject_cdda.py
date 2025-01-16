@@ -22,7 +22,7 @@ UHOME = expanduser("~")
 sys.path.append(f'{UHOME}/pe.audio.sys/share/miscel')
 
 from    miscel  import  read_state_from_disk, read_metadata_from_disk, \
-                        time_diff, LOG_FOLDER, USER
+                        time_diff, get_timestamp, LOG_FOLDER, USER
 
 
 def main_loop():
@@ -61,9 +61,9 @@ def main_loop():
 
             if disc_is_over:
 
-                tmp = f'{ctime()} tpos: {time_pos}, ttot: {time_tot}'
+                tmp = f'{get_timestamp()} tpos: {time_pos.rjust(8)}, ttot: {time_tot.rjust(8)}, track {track_num} of {tracks}'
                 print(f'(autoeject_cdda) {tmp}')
-                with open(logPath, 'a') as f:
+                with open(LOG_PATH, 'a') as f:
                     f.write(f'{tmp}, ejecting disc.\n')
 
                 # real audio can be buffered several seconds
@@ -86,7 +86,7 @@ def stop():
 
 if __name__ == '__main__':
 
-    logPath = f'{LOG_FOLDER}/autoeject_cdda.log'
+    LOG_PATH = f'{LOG_FOLDER}/autoeject_cdda.log'
 
     if sys.argv[1:]:
         if sys.argv[1] == 'start':
