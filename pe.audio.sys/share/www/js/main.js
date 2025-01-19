@@ -1551,6 +1551,9 @@ function buttonSwapLRHighlight(){
 
 
 function buttonCompressorHighlight(){
+    if ( ! web_config.use_compressor ){
+        return
+    }
     if ( state.compressor === 'off' ) {
         document.getElementById("bt_compressor").innerHTML = 'comp.<br>OFF';
         document.getElementById("bt_compressor").style.border = "2px solid rgb(100, 100, 100)";
