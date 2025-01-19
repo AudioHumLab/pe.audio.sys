@@ -29,7 +29,7 @@ from    getpass import getuser
 USER                = getuser()
 UHOME               = os.path.expanduser("~")
 MAINFOLDER          = f'{UHOME}/pe.audio.sys'
-CONFIG              = {'use_compressor': False}
+CONFIG              = {}
 LOUDSPEAKER         = ''
 EQ_CURVES           = {}
 LSPK_FOLDER         = f'{MAINFOLDER}/loudspeakers/{LOUDSPEAKER}'
@@ -147,6 +147,10 @@ def _init():
     # cd-rom device
     if not 'cdrom_device' in CONFIG or not CONFIG["cdrom_device"]:
         CONFIG["cdrom_device"] = '/dev/cdrom'
+
+    # Use compressor (optional)
+    if not 'use_compressor' in CONFIG:
+        CONFIG['use_compressor'] = False
 
 
 # AUTOEXEC

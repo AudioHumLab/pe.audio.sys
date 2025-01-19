@@ -79,7 +79,7 @@ def _init():
     def stop_cdsp():
 
         sp.call('killall -KILL camilladsp 1>/dev/null 2>&1', shell=True)
-        sleep(.1) # safest
+        sleep(.25) # safest
 
         tries = 10
         while tries:
