@@ -17,7 +17,6 @@ from    config                  import  CONFIG
 from    miscel                  import  get_remote_zita_params, \
                                         remote_zita_restart
 from    preamp_mod.core         import  Preamp, Convolver
-import  camilla_dsp             as      cdsp
 
 # INITIATE A PREAMP INSTANCE
 preamp = Preamp()
@@ -30,6 +29,9 @@ convolver = Convolver()
 
 # INITIATE CamillaDSP (currently only used for an optional compressor)
 if CONFIG["use_compressor"]:
+
+    import  camilla_dsp             as      cdsp
+
     cdsp._init()
     if cdsp.compressor('get')["active"]:
         preamp.state["compressor"] = cdsp.compressor('get')["parameters"]["ratio"]
