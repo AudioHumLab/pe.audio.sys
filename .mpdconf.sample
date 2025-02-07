@@ -43,7 +43,7 @@ database {
 
 input {
     plugin  "cdio_paranoia"
-    # speed 2 is a quieter than 1, with an Apple SuperDrive USB unit 
+    # speed 2 is quieter than 1, with an Apple SuperDrive USB unit 
     speed   "2"
     # mode disable|overlap|full
     mode    "overlap"
