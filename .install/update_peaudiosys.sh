@@ -179,9 +179,9 @@ EQFOLDER=$HOME/pe.audio.sys/share/eq
 if test -f $EQFOLDER/freq.dat && \
    test -f $EQFOLDER/bass_mag.dat && \
    test -f $EQFOLDER/treble_mag.dat; then
-    echo "Detected share/eq/xxxx.dat files"
+    echo "(i) Detected share/eq/xxxx.dat files in use."
 else
-    echo "Copying eq.sample.R20_audiotools/xxxxx.dat to share/eq/"
+    echo "(i) Copying eq.sample.R20_audiotools/xxxxx.dat to share/eq/"
     cp  $EQFOLDER/eq.sample.R20_audiotools/*dat  $EQFOLDER/
 fi
 

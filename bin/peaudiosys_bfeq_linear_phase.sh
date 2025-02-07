@@ -4,6 +4,15 @@
 # This file is part of 'pe.audio.sys'
 # 'pe.audio.sys', a PC based personal audio system.
 
+# This is only for testing purposes. The minimum or linear phase behavior
+# of the soft EQ stage of Brutefir must be selected in the config file.
+
+
+function help_exit {
+    echo "Usage: peaudiosys_bfeq_linear_phase.sh  toggle | true | false"
+    exit 0
+}
+
 if [[ $1 ]]; then
 
     if [[ $1 == *"true"* || $1 == *"false"* ]]; then
@@ -17,12 +26,10 @@ if [[ $1 ]]; then
             new='true'
         fi
     else
-        echo "Usage: peaudiosys_bfeq_linear_phase.sh  toggle | true | false"
-        exit 0
+        help_exit
     fi
 else
-    echo "Usage: peaudiosys_bfeq_linear_phase.sh  toggle | true | false"
-    exit 0
+    help_exit
 fi
 
 # Editing config.yml
@@ -40,7 +47,7 @@ while [[ $times -ne "0" ]]; do
     if [[ $ans == *"level"* ]]; then
         break
     fi
-    sleep .1
+    sleep 1
     ((times--))
 done
 

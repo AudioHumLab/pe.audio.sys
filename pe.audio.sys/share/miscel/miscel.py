@@ -207,7 +207,7 @@ def start_jack_stuff(config=CONFIG):
         jBkndOpts  = f'-p {jc["period"]}'
 
     # set FS
-    jBkndOpts += f' -r {read_bf_config_fs()}'
+    jBkndOpts += f' -r {CONFIG["sample_rate"]}'
 
     # other backend options (config.yml)
     if ('miscel' in jc) and (jc["miscel"]):
@@ -243,7 +243,7 @@ def start_jack_stuff(config=CONFIG):
     sleep(1)
     tries = 10
     while tries:
-        if jack_is_running():
+        if jack_lsp():
             print(f'{Fmt.BOLD}{Fmt.BLUE}(start) JACKD STARTED{Fmt.END}')
             break
         print(f'(start) waiting for jackd ' + '.' * tries)
@@ -323,49 +323,15 @@ def check_jloops(config=CONFIG):
         return False
 
 
-def jack_is_running():
-    """ checks for jackd process to be running
+def jack_lsp():
+    """ checks for jackd ports to be accesible
         (bool)
     """
     try:
-        sp.check_output('jack_lsp >/dev/null 2>&1'.split())
+        sp.check_output( 'jack_lsp 1>/dev/null 2>&1'.split() )
         return True
-    except sp.CalledProcessError:
-        return False
-
-
-def jackd_process(cname):
-    """ Check the if the jackd process is running
-    """
-    try:
-        tmp = sp.check_output(f'pgrep -u {USER} -fla jackd'.split()).decode().strip()
     except:
-        tmp = ''
-    if cname in tmp:
-        return True
-    else:
         return False
-
-
-def jackd_response(cname=''):
-    """ Check the jackd process responds properly
-        (!) A false jackd process may occur after the USB DAC
-            was disconnected
-    """
-    def check_jack_lsp():
-        try:
-            sp.check_output('jack_lsp')
-            return True
-        except:
-            return False
-
-    result = False
-
-    if jackd_process(cname):
-        if check_jack_lsp():
-            result = True
-
-    return result
 
 
 def peaudiosys_server_is_running(timeout=30):

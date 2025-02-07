@@ -467,6 +467,12 @@ if __name__ == "__main__":
             print(f'({Fmt.BOLD}start) Problems starting BRUTEFIR: {bfstart}')
             sys.exit()
 
+        # - CamillaDSP (currently used only for an optional compressor)
+        if CONFIG["use_compressor"]:
+            import  camilla_dsp
+            # Inits CamillaDSP with the compressor bypassed, standalone process (Popen)
+            camilla_dsp._init(compressor='off')
+
         # Optional REMOTE SOURCES
         if REMOTES:
             start_zita_link()

@@ -32,14 +32,16 @@ MAINFOLDER          = f'{UHOME}/pe.audio.sys'
 CONFIG              = {}
 LOUDSPEAKER         = ''
 EQ_CURVES           = {}
-LSPK_FOLDER         = f'{MAINFOLDER}/loudspeakers/{LOUDSPEAKER}'
-BFCFG_PATH          = f'{LSPK_FOLDER}/brutefir_config'
+LSPK_FOLDER         = ''
+BFCFG_PATH          = ''
 
 BFDEF_PATH          = f'{UHOME}/.brutefir_defaults'
 STATE_PATH          = f'{MAINFOLDER}/.state'
-TONE_MEMO_PATH      = f'{MAINFOLDER}/.tone_memo'    # a tone_defeat helper
+TONE_MEMO_PATH      = f'{MAINFOLDER}/.tone_memo'            # a tone_defeat helper
 LOG_FOLDER          = f'{MAINFOLDER}/log'
 EQ_FOLDER           = f'{MAINFOLDER}/share/eq'
+
+CAMILLA_CFG_PATH    = f'{MAINFOLDER}/config/camilladsp.yml'
 
 MACROS_FOLDER       = f'{MAINFOLDER}/macros'
 LDCTRL_PATH         = f'{MAINFOLDER}/.loudness_control'
@@ -135,8 +137,9 @@ def _init():
         print(f'(config) ERROR reading \'config.yml\'')
         sys.exit()
 
+    FS                  = CONFIG['sample_rate']
     LOUDSPEAKER         = CONFIG['loudspeaker']
-    LSPK_FOLDER         = f'{MAINFOLDER}/loudspeakers/{LOUDSPEAKER}'
+    LSPK_FOLDER         = f'{MAINFOLDER}/loudspeakers/{LOUDSPEAKER}/{FS}'
     BFCFG_PATH          = f'{LSPK_FOLDER}/brutefir_config'
 
     EQ_CURVES = find_eq_curves()

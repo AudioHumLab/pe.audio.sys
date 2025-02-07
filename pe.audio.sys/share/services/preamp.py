@@ -27,16 +27,14 @@ preamp.save_state()
 # INITIATE A CONVOLVER INSTANCE (XO and DRC management)
 convolver = Convolver()
 
-# INITIATE CamillaDSP (currently only used for an optional compressor)
+# Import CamillaDSP (currently only used for an optional compressor)
 if CONFIG["use_compressor"]:
 
-    import  camilla_dsp             as      cdsp
-
-    cdsp._init()
-    if cdsp.compressor('get')["active"]:
-        preamp.state["compressor"] = cdsp.compressor('get')["parameters"]["ratio"]
-    else:
-        preamp.state["compressor"] = 'off'
+    import  camilla_dsp as cdsp
+    # Initiate the websocket
+    cdsp.PC.connect()
+    # Camilla compresor is baypassed at startup
+    preamp.state["compressor"] = 'off'
 
 
 # Interface function for this module

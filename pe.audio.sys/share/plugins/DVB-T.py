@@ -35,6 +35,15 @@
 
 """
 
+""" Example of ERROR in Mplayer printout:
+
+        DVB CONFIGURATION IS EMPTY, exit
+
+    This is CONFUSING, because the real problem was that the DVB card was not detected
+    (wrong USB connection, see dmesg or journalctrl)
+"""
+
+
 """ Examples of Mplayer printouts when playing DVB-T radio channels
 
 rafax@salon64:~$ mplayer -nolirc -ao alsa "dvb://Radio Clasica HQ MPA"
@@ -255,7 +264,6 @@ if __name__ == '__main__':
 
     # Check the necessary files for this to work
     do_check_files()
-
 
     ### Reading the command line
     if sys.argv[1:]:

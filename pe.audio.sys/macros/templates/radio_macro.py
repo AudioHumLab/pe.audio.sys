@@ -86,7 +86,7 @@ def main():
 
     # Check for Mplayer ports to re-emerge
     # (some streaming urls take several seconds to load)
-    if not wait4ports( f'mplayer_{mplayer_profile}', timeout=45):
+    if not wait4ports( f'mplayer_{mplayer_profile}', timeout=20):
         print(f'{Fmt.RED}(radio_macro) ERROR jack ports \'mplayer_{mplayer_profile}\' not found, '
               f'bye :-/{Fmt.END}')
         # Warning message

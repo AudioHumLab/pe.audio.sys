@@ -235,7 +235,11 @@ def mpd_control( cmd, arg='', port=MPD_PORT ):
     # (i) Must wait a bit to avoid a weird behavior after ordering a command
     sleep(.2)
 
-    st = c.status()
+    try:
+        st = c.status()
+    except Exception as e:
+        print(f'{Fmt.RED}(mpd_mod.py) `status` no answer from MPD{Fmt.END}')
+        return 'stop'
 
     try:
 
@@ -283,9 +287,17 @@ def mpd_meta( md=PLAYER_METATEMPLATE.copy() ):
         print(f'{Fmt.RED}(mpd_mod.py) mpd_meta not connected to MPD{Fmt.END}')
         return  md
 
-    st = c.status()
+    try:
+        st = c.status()
+    except Exception as e:
+        print(f'{Fmt.RED}(mpd_mod.py) `status` no answer from MPD{Fmt.END}')
+        return md
 
-    cs = c.currentsong()
+    try:
+        cs = c.currentsong()
+    except Exception as e:
+        print(f'{Fmt.RED}(mpd_mod.py) `currentsong` no answer from MPD{Fmt.END}')
+        return md
 
 
     # (i) Not all tracks have complete currentsong() fields. Some examples:

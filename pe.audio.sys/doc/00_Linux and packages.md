@@ -92,8 +92,8 @@ sudo apt install jackd2 brutefir alsa-utils libasound2-dev libasound2-plugins  \
                  libjack-jackd2-dev libsamplerate0 libsamplerate0-dev  \
                  mpd mpc gmpc ncmpcpp mplayer cdtool usbmount\
                  ecasound ecatools python3-ecasound ladspa-sdk  \
-                 fil-plugins zita-ajbridge zita-njbridge \
-                 apache2 libapache2-mod-php mc jq anacron netcat-traditional source-highlight
+                 fil-plugins zita-ajbridge zita-njbridge apache2 \
+                 libapache2-mod-php php-yaml mc jq anacron netcat-traditional source-highlight
 ```
 
 (i) If you have Debian version < 12 _bookworm_, please use `netcat` instead of `netcat-traditional`

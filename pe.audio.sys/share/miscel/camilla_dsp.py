@@ -16,7 +16,7 @@ sys.path.append(f'{UHOME}/pe.audio.sys/share/miscel')
 from   miscel   import process_is_running, LOG_FOLDER, Fmt
 import jack_mod as jack
 
-COMPRESSOR_CYCLE = ['off', '3.0:1', '6.0:1', '9.0:1']
+COMPRESSOR_CYCLE = ['off', '1.0:1', '2.0:1', '3.0:1']
 
 HOST        = '127.0.0.1'
 PORT        = 1234
@@ -74,7 +74,9 @@ def _insert_cdsp():
     jack.connect('cpal_client_out:out_1', 'brutefir:in.R')
 
 
-def _init():
+def _init(compressor='off'):
+    """ defaults to bypass the compressor stage
+    """
 
     def stop_cdsp():
 
@@ -131,8 +133,8 @@ def _init():
     # Running
     run_cdsp(CAMILLA_YML)
 
-    # Deactivate compressor
-    _bypass('compressor', True)
+    # Set the compressor (default is bypassed)
+    _bypass('compressor', not compressor != 'off')
 
 
 def _bypass(step='', mode='state'):

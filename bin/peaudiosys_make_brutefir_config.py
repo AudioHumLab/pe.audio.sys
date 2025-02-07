@@ -623,7 +623,7 @@ def read_config():
     if not CONFIG["samplerate"] in (44100, 48000, 96000):
         raise Exception( f'Bad samplerate in brutefir_config.yml' )
 
-    FS = CONFIG["samplerate"]
+    FS = CONFIG["sample_rate"]
 
 
     # Filter length (partition size and number of partitions)

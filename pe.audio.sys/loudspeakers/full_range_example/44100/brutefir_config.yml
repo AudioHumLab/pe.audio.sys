@@ -28,27 +28,21 @@
 
 # Samplerate
 #
-samplerate: 44100
+sample_rate: 44100
 
 
 # Filter length (see Brutefir doc)
 #
-filter_length:  2048,8
+filter_length:  2048,16
 
 
-# Mapping of physical JACK ports and Brutefir outputs
+# Mapping of physical Jack ports and Brutefir outputs
 #
 outputs:
 
-    # JackOut   BrutefirId  Gain dB    Polarity +/-    Delay ms
-    1:
-    2:
-    3:          hi.L         -4.5       -            0.0
-    4:          hi.R         -4.5       -            0.0
-    5:
-    6:          sw            0.0       +            0.0
-    7:          lo.L        -10.0       +            0.75
-    8:          lo.R        -10.0       +            0.75
+    # Out   BrutefirId  Gain dB    Polarity +/-    Delay ms
+    1:      fr.L
+    2:      fr.R
 
 
 # Apply dither to outputs
@@ -70,6 +64,5 @@ subsonic:   true
 #
 drc_flat_region_dB:
 
-        sofa:           0.0
-        equilat:        4.0
+        equilat:        0.0
 

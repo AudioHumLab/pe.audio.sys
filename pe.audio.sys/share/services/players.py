@@ -53,16 +53,17 @@ from  players_mod.mplayer           import  mplayer_control,            \
 from  players_mod.librespot         import  librespot_control,          \
                                             librespot_meta
 
-from  players_mod.spotify_desktop   import  spotify_control,            \
-                                            spotify_meta,               \
-                                            spotify_playlists
+## Spotify client detection
+SPOTIFY_CLIENT = detect_spotify_client()
 
+if SPOTIFY_CLIENT == 'desktop':
+
+    from  players_mod.spotify_desktop   import  spotify_control,            \
+                                                spotify_meta,               \
+                                                spotify_playlists
 
 ## Getting sources list
 SOURCES = CONFIG["sources"]
-
-## Spotify client detection
-SPOTIFY_CLIENT = detect_spotify_client()
 
 # The runtime metadata variable and the loop refresh period in seconds
 CURRENT_MD          = PLAYER_METATEMPLATE.copy()
@@ -284,6 +285,7 @@ def random_control(arg):
 
         if   SPOTIFY_CLIENT == 'desktop':
             result = spotify_control('random', arg)
+
         elif SPOTIFY_CLIENT == 'librespot':
             result = librespot_control('random', arg)
 
