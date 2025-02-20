@@ -33,7 +33,7 @@ from  config                        import  CONFIG, MAINFOLDER,         \
                                             CDDA_META_PATH,             \
                                             CDDA_META_TEMPLATE
 
-from  miscel                        import  detect_spotify_client,      \
+from  miscel                        import  get_spotify_plugin,         \
                                             read_state_from_disk,       \
                                             read_cdda_meta_from_disk,   \
                                             read_mpd_config,            \
@@ -53,10 +53,7 @@ from  players_mod.mplayer           import  mplayer_control,            \
 from  players_mod.librespot         import  librespot_control,          \
                                             librespot_meta
 
-## Spotify client detection
-SPOTIFY_CLIENT = detect_spotify_client()
-
-if SPOTIFY_CLIENT == 'desktop':
+if get_spotify_plugin() == 'desktop':
 
     from  players_mod.spotify_desktop   import  spotify_control,            \
                                                 spotify_meta,               \
@@ -138,10 +135,10 @@ def get_meta():
 
     if 'librespot' in source or 'spotify' in source.lower():
 
-        if SPOTIFY_CLIENT == 'desktop':
+        if get_spotify_plugin() == 'desktop':
             md = spotify_meta(md)
 
-        elif SPOTIFY_CLIENT == 'librespot':
+        elif get_spotify_plugin() == 'librespot':
             md = librespot_meta(md)
 
         # source is spotify like but no client running has been detected:
@@ -204,10 +201,10 @@ def playback_control(cmd, arg=''):
 
     elif source.lower() == 'spotify':
 
-        if   SPOTIFY_CLIENT == 'desktop':
+        if   get_spotify_plugin() == 'desktop':
             result = spotify_control(cmd, arg)
 
-        elif SPOTIFY_CLIENT == 'librespot':
+        elif get_spotify_plugin() == 'librespot':
             result = librespot_control(cmd)
 
         else:
@@ -261,7 +258,7 @@ def playlists_control(cmd, arg):
 
     elif source == 'spotify':
 
-        if   SPOTIFY_CLIENT == 'desktop':
+        if   get_spotify_plugin() == 'desktop':
             result = spotify_playlists(cmd, arg)
 
     # 2024.11 not in use
@@ -283,10 +280,10 @@ def random_control(arg):
 
     elif source == 'spotify':
 
-        if   SPOTIFY_CLIENT == 'desktop':
+        if   get_spotify_plugin() == 'desktop':
             result = spotify_control('random', arg)
 
-        elif SPOTIFY_CLIENT == 'librespot':
+        elif get_spotify_plugin() == 'librespot':
             result = librespot_control('random', arg)
 
     return result

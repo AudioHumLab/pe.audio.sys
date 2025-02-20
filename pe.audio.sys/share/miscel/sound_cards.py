@@ -192,8 +192,8 @@ def get_pulse_cards():
     return pa_cards
 
 
-def release_cards_from_pulseaudio():
-    """ Release pe.audio.sys cards from Pulseaudio
+def remove_cards_in_pulseaudio():
+    """ Removing card usage in Pulseaudio (also includes PipeWire)
         (void)
     """
 
@@ -212,10 +212,22 @@ def release_cards_from_pulseaudio():
 
 
     pulse_cards  = get_pulse_cards()
-    for pc in pulse_cards:
-        for cdev in get_config_sound_devices():
-            cname = alsa_device2card(cdev)
-            cname = alsa_card_long_name(cname)
-            if pulse_cards[pc]["alsa_name"] == cname:
-                PA_release_card( pulse_cards[pc]["pa_name"] )
-                break
+
+    for card_id, card_props in pulse_cards.items():
+
+        # OLD criterion: release only pe.audio.sys configured cards
+        #for cdev in get_config_sound_devices():
+        #
+        #    cname = alsa_device2card(cdev)
+        #
+        #    cname = alsa_card_long_name(cname)
+        #
+        #    if pulse_cards[pc]["alsa_name"] == cname:
+        #
+        #        PA_release_card( card_props["pa_name"] )
+        #
+        #        break
+
+        # NEW criterion: release ALL sound cards
+        PA_release_card( card_props["pa_name"] )
+

@@ -22,7 +22,7 @@ jack:
     # 'silent' will disable Xrun printouts, set to 'false' if you want to monitor Xruns
     silent:     false
 
-    # - Do not configure here sample rate, it will be detected internally.
+    # - Do not configure here the sampling rate, see the above global parameter
     # - nperiods normally set to 2, or 3 for serial interfaces (usb, firewire)
     # - miscel parameters examples:
     #     miscel: --shorts    # for 16 bit depth
@@ -246,7 +246,7 @@ plugins:
     ## Internet url audio streams player based on Mplayer:
     #- istreams.py
 
-    ## Set Pulseaudio apps to sound through by JACK:
+    ## Set Pulseaudio apps to sound through by JACK (Do NOT use with PipeWire):
     #- pulseaudio-jack-sink.py
 
     ## DVB-T player based on Mplayer, useful for DVB-T radio stations:
@@ -261,8 +261,8 @@ plugins:
     ## librespot (a headless Spotify Connect player daemon)
     #- librespot.py
 
-    ## A Spotify Desktop monitor
-    #- spotify_monitor.py
+    ## A Spotify Desktop launcher and monitor
+    - spotify_desktop.py
 
     ## Plays audio streamed from AirPlay sources
     #- shairport-sync.py

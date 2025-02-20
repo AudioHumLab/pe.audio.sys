@@ -116,7 +116,12 @@ def get_devs_snd_use():
         tmp = check_output(cmd, shell=True).decode().strip()
 
     except Exception as e:
-        print(f"error with fuser: {str(e)}")
+
+        # Normal behavior if none in use:
+        # Command 'fuser -v /dev/snd/* 2>&1' returned non-zero exit status 1.
+        if not 'returned non-zero exit status 1' in str(e):
+            print(f"error with fuser: {str(e)}")
+
         return d
 
     # skip first line

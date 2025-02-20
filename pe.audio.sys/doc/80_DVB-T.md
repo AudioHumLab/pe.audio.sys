@@ -1,5 +1,5 @@
 # 0. NOTICE
-This file is a COPY from the former project **FIRtro** at https://github.com/AudioHumLab/FIRtro
+This file is an UPDATED COPY from the former project **FIRtro** at https://github.com/AudioHumLab/FIRtro
 
 
 # 1. HW
@@ -14,9 +14,11 @@ Podemos usar un pincho USB receptor de DVB-T como por ejemplo:
 
 - AverMedia AverTV Volar HD2, USB `https://github.com/OpenELEC/dvb-firmware/blob/master/firmware/dvb-usb-it9135-02.fw`
 
-- NPG Real HDTV Nano 3D `http://www.npgtech.com/multimedia/24-categoria-productos/multimedia/51-real-hdtv-nano-3d.html`
+- (VER NOTA) NPG Real HDTV Nano 3D `http://www.npgtech.com/multimedia/24-categoria-productos/multimedia/51-real-hdtv-nano-3d.html`
 
 ![NPG](https://github.com/Rsantct/pe.audio.sys/blob/master/pe.audio.sys/doc/images/NPG%20HDTV%20Nano%203D.jpg)
+
+- Hauppauge WinTv-soloHD (obtener el firmware del fabricante https://www.hauppauge.com/pages/support/support_linux.html) ok 2025-feb
 
 (i) IMPORTANTE: estas tarjetas necesitan un firmware, ver:
 
@@ -27,6 +29,26 @@ Los archivos de FW de estas dos tarjetas se han incluido en el repositorio de FI
 Podemos hacer un enlace o copiarlo en `/lib/firmware` para que sea reconocido por nuestro sistema Linux:
 
     sudo ln -s /home/firtro/custom/firmware/dvb_nova_12mhz_b0.inp /lib/firmware/
+
+### Problemas NPG Real HDTV Nano
+
+A partir de Ubuntu 24.04 con kernel 6.xx, ocurren XRUNS y problemas en el kernel (dmesg, journalctl)
+
+    feb 16 10:18:00 salon64 kernel: ------------[ cut here ]------------
+    feb 16 10:18:00 salon64 kernel: invalid sysfs_emit_at: buf:00000000c5a69535 at:0
+    feb 16 10:18:00 salon64 kernel: WARNING: CPU: 3 PID: 0 at fs/sysfs/file.c:777 sysfs_emit_at+0x64/0xd0
+    ...
+    feb 16 10:18:00 salon64 kernel:  smsdvb_print_dvb_stats+0x4d/0x490 [smsdvb]
+    feb 16 10:18:00 salon64 kernel:  smsdvb_update_dvb_stats+0x2c/0x280 [smsdvb]
+    feb 16 10:18:00 salon64 kernel:  smsdvb_onresponse+0x1fd/0x660 [smsdvb]
+    feb 16 10:18:00 salon64 kernel:  smscore_onresponse+0x94/0x520 [smsmdtv]
+    feb 16 10:18:00 salon64 kernel:  ? dma_unmap_page_attrs+0x1a4/0x210
+    feb 16 10:18:00 salon64 kernel:  smsusb_onresponse+0x117/0x220 [smsusb]
+    ...
+    feb 16 10:18:00 salon64 kernel: ---[ end trace 0000000000000000 ]---
+
+Según pruebas realizadas parece ser que `firmware/dvb_nova_12mhz_b0.inp` no es compatible con kernel 6.xx
+
 
 # 2. Módulos del kernel para DVB
 

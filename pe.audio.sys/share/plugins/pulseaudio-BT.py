@@ -5,6 +5,8 @@
 # 'pe.audio.sys', a PC based personal audio system.
 
 """
+    -- THIS IS OBSOLETE --
+
     Enables Pulseaudio to get sound from paired BT devices.
 
     usage:  pulseaudio-BT.py   start|stop

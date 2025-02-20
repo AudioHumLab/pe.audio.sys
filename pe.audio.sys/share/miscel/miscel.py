@@ -23,7 +23,7 @@ import  jack
 
 from    config      import  *
 from    fmt         import  Fmt
-from    sound_cards import  release_cards_from_pulseaudio
+from    sound_cards import  remove_cards_in_pulseaudio
 
 
 # --- MPD auxiliary
@@ -229,9 +229,8 @@ def start_jack_stuff(config=CONFIG):
         sp.Popen('ffado-dbus-server 1>/dev/null 2>&1', shell=True)
         sleep(2)
 
-    # Pulseaudio
-    if 'pulseaudio' in sp.check_output("pgrep -fl pulseaudio", shell=True).decode():
-        release_cards_from_pulseaudio()
+    # Pulseaudio / Pipewire
+    remove_cards_in_pulseaudio()
 
     # Launch JACKD process
     with open(f'{LOG_FOLDER}/jackd.log', 'w') as jlog:
@@ -817,27 +816,43 @@ def check_Mplayer_config_file(profile='istreams'):
         return f'ERROR bad Mplayer profile \'{profile}\''
 
 
-def detect_spotify_client():
-    """ Detects the Spotify Client in use: 'desktop' or 'librespot'
-        (string)
+def get_spotify_plugin():
+    """ Get the configured Spotify Client plugin
+        return: 'desktop', 'librespot' or ''
     """
-    result = ''
+    if 'spotify_desktop.py' in CONFIG["plugins"]:
+        return 'desktop'
 
-    # If using librespot
-    try:
-        sp.check_output( f'pgrep -u {USER} -f librespot'.split() )
-        result = 'librespot'
-    except:
-        pass
+    elif 'librespot.py' in CONFIG["plugins"]:
+        return 'librespot'
 
-    # If using plugins/spotify_monitor.py while running a Spotify Desktop client
-    try:
-        sp.check_output( f'pgrep -u {USER} -f spotify_monitor'.split() )
-        result = 'desktop'
-    except:
-        pass
+    else:
+        return ''
 
-    return result
+
+def detect_spotify_client():
+    """ Detection of the Spotify Client in use.
+        return: 'desktop', 'librespot' or ''
+    """
+
+    # Iterate through all running processes
+    for proc in psutil.process_iter(['cmdline']):
+
+        try:
+
+            # (i) proc.info['cmdline']) is a list of command line args
+            cmdline = ' '.join( proc.info['cmdline'] )
+
+            if 'spotify/spotify' in cmdline.lower():
+                return 'desktop'
+
+            elif 'librespot' in cmdline.lower():
+                return 'librespot'
+
+        except:
+            pass
+
+    return ''
 
 
 def read_state_from_disk():

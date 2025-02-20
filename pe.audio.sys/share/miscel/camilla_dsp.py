@@ -124,7 +124,7 @@ def _init(compressor='off'):
         _insert_cdsp()
 
         # Unmute
-        PC.mute.set_main(False)
+        PC.volume.set_main_mute(False)
 
 
     if process_is_running('camilladsp'):
@@ -183,17 +183,17 @@ def mute(mode='state'):
     """
 
     if mode in (True, 'true', 'on', 1):
-        PC.mute.set_main(True)
+        PC.volume.set_main_mute(True)
 
     if mode in (False, 'false', 'off', 0):
-        PC.mute.set_main(False)
+        PC.volume.set_main_mute(False)
 
     if mode == 'toggle':
-        new_mode = {True: False, False: True} [PC.mute.main() ]
-        PC.mute.set_main(new_mode)
+        new_mode = {True: False, False: True} [PC.volume.main_mute() ]
+        PC.volume.set_main_mute(new_mode)
 
 
-    return PC.mute.main()
+    return PC.volume.main_mute()
 
 
 def state():

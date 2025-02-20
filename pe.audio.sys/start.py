@@ -157,9 +157,11 @@ def manage_server( mode='', service='peaudiosys'):
             SRV_PORT += 1
         print(f'{Fmt.BLUE}(start) starting \'server.py ' \
               f'{service} {SRV_ADDR}:{SRV_PORT}\'{Fmt.END}')
+
         cmd = f'python3 {MAINFOLDER}/share/miscel/server.py ' \
               f'{service} {SRV_ADDR} {SRV_PORT}'
-        sp.call(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
+
+        sp.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
 
     else:
         raise Exception(f'bad manage_server call')
@@ -454,6 +456,15 @@ if __name__ == "__main__":
         if  jack_stuff != 'done':
             print(f'{Fmt.BOLD}(start) Problems starting JACK: {jack_stuff}{Fmt.END}')
             sys.exit()
+
+        # PIPEWIRE needs to reconnect to this new JACK
+        if process_is_running('pipewire'):
+            try:
+                sp.call( 'systemctl --user restart pipewire', shell=True)
+                print(f'{Fmt.BLUE}(start) Reloading PipeWire for jack-sink ...{Fmt.END}')
+            except Exception as e:
+                print(f'{Fmt.BOLD}(start) Problems restarting PipeWire: {str(e)}{Fmt.END}')
+                sys.exit()
 
         # INIT AUDIO by importing 'core' temporally (needs JACK to be running)
         import share.services.preamp_mod.core as core

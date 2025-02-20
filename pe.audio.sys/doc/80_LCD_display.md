@@ -11,19 +11,40 @@ https://github.com/AudioHumLab/FIRtro/wiki/855-Display-LCD
 
 # The software
 
-`lcdproc` versions 0.5.6 and 0.5.7 works with the *usb4all* driver, but newer Debian packaged versions does not.
+The recent Debian `lcdproc` packages comes precompiled **without** USB4ALL support, so DO NOT INSTALL the **lcdproc** APT package.
 
-So it is necessary to download **0.5.7** from sourceforge and manually compile.
+You'll need to get the latest release from the lcdproc repository (probably 0.5.9), see here: https://github.com/lcdproc/lcdproc/releases
 
-https://sourceforge.net/projects/lcdproc/files/
+    mkdir tmp
+    cd tmp
+    wget https://github.com/lcdproc/lcdproc/releases/download/v0.5.9/lcdproc-0.5.9.tar.gz
+    tar -xzvf lcdproc-0.5.9.tar.gz
 
-    ./configure --prefix=/usr/local --enable-drivers=hd44780
+Then compile **SEE NOTE BELOW**
+
+    sudo apt install pkg-config build-essential libncurses5-dev libusb-dev libfreetype-dev automake autoconf m4 perl
+
+    cd lcdproc-0.5.9
+    ./configure --prefix=/usr/local --enable-drivers=hd44780,curses
     make
     sudo make install
 
-Above will install lcdproc under `/usr/local` then you need to point to that location under `pe.audio.sys/share/scripts/lcd/LCDd.conf`:
+The above `--prefix=/usr/local` is not mandatory, you only need the binaries `lcdproc` `LCDd` and the drivers `hd44780.so` `curses.so`. But `/usr/local` is the standard choice.
+
+As per above, lcdproc drivers will be located under `/usr/local/lib/lcdproc/` then you need to point to that location under `pe.audio.sys/share/plugins/lcd/LCDd.conf`:
 
     DriverPath=/usr/local/lib/lcdproc/
+
+Other configuration settings are already provided in `share/plugins/lcd/LCDd.conf`
+
+### COMPILATION WILL FAIL in recent Ubuntu distros >= 24.04 with kernel 6
+
+I don't know the reason why, maybe some old compile directives in lcdproc 0.5.9 need to be updated.
+
+A workaround is to compile it in another machine with an older Debian system, for instance a VM running Ubuntu 18.04.
+
+Once compiled, simply copy all the ldcproc staff `/usr/local/.....` to your current system.
+
 
 ## usb4all needs USB permissions
 
@@ -34,7 +55,7 @@ Prepare `/etc/udev/rules.d/50-usb.rules`
 
 And include your user into the `dialout` group:
 
-    sudo usermod -G dialout -a predic
+    sudo usermod -G dialout -a YOURUSER
 
 **Reboot the machine**
 

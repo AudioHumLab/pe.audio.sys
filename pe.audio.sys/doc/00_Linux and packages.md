@@ -88,20 +88,23 @@ sudo apt update && sudo apt upgrade
 ```
 
 ```
-sudo apt install jackd2 brutefir alsa-utils libasound2-dev libasound2-plugins  \
-                 libjack-jackd2-dev libsamplerate0 libsamplerate0-dev  \
-                 mpd mpc gmpc ncmpcpp mplayer cdtool usbmount\
-                 ecasound ecatools python3-ecasound ladspa-sdk  \
-                 fil-plugins zita-ajbridge zita-njbridge apache2 \
-                 libapache2-mod-php php-yaml mc jq anacron netcat-traditional source-highlight
+sudo apt install jackd2 brutefir alsa-utils libasound2-dev libasound2-plugins \
+                 libjack-jackd2-dev libsamplerate0 libsamplerate0-dev \
+                 mpd mpc gmpc ncmpcpp mplayer cdtool zita-ajbridge zita-njbridge \
+                 apache2 libapache2-mod-php php-yaml mc jq anacron \
+                 source-highlight git netcat-openbsd
 ```
 
-(i) If you have Debian version < 12 _bookworm_, please use `netcat` instead of `netcat-traditional`
+(i) `netcat` seems to be a legacy package. If you have Debian version < 12 _bookworm_, please use `netcat`. If `nc` does not work for you, try instead `netcat-traditional`.
 
 You **MUST** be vigilant during the installation to answer YES when asked for enable **"real time" for JACK**.
 
 (i) We have chosen to install Midnight Commander `mc` because it is a helpful console based file browser. The comand line tool `jq` can be useful to read json files from command line. `anacron` supports daily automatic updates of pe.audio.sys.
 
+Obsolete (only if you plan to use PEQ based in Ecasound), but we are planing to use CamillaDSP for this (work in progress)
+```
+    sudo apt install ecasound ecatools python3-ecasound ladspa-sdk fil-plugins 
+```
 
 **Disable default MPD setup:**
 

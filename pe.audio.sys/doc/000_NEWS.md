@@ -113,4 +113,7 @@ See the `doc/` folder for detailed information about this.
 - 1st integration of CamillaDSP, currently only provides the optional compressor, more to coming ;-)
 - New optional compressor useful for watching movies with difficult dialogue dynamics at low listening levels.
 
+## Feb 2025, version 2.0a
+- adapt to PipeWire (optional)
+- update some doc about DVB-T and LCD
   
