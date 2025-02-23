@@ -790,15 +790,15 @@ def add_delay(ms):
     result  = 'nothing done'
 
     outputs = get_config_outputs()
-    FS      = int( read_bf_config_fs() )
+    fs      = int( read_bf_config_fs() )
 
     # From ms to samples
-    delay = int( FS  * ms / 1e3)
+    delay = int( fs  * ms / 1e3)
 
     cmd = ''
     too_much = False
     max_available    = int( get_config()['maxdelay'] )
-    max_available_ms = max_available / FS * 1e3
+    max_available_ms = max_available / fs * 1e3
 
     for o in outputs:
 
@@ -811,7 +811,7 @@ def add_delay(ms):
         if new_delay > max_available:
             too_much = True
             max_available   -= cfg_delay
-            max_available_ms = max_available / FS * 1e3
+            max_available_ms = max_available / fs * 1e3
         cmd += f'cod {o} {new_delay};'
 
     # Issue new delay to Brutefir's outputs

@@ -14,8 +14,14 @@
     usage:   spotify_desktop.py   start | stop
 
     NOTICE: In recent desktops running PipeWire, we need here to restart
-            the Sopotify Desktop process, in order to link properly to the
+            the Spotify Desktop process, in order to link it to the proper
             PipeWire-Jack sink after restarting the pe.audio.sys Jack process.
+
+            We also RECOMMEND to minimize Spotify in order to stop
+            Spotify main window to load lots of widgets with high CPU spense:
+
+                apt install xdotool  (see below command line)
+
 """
 #
 # THIS needs: apt install playerctl
@@ -58,7 +64,12 @@ def check_Spotify_Desktop_process():
 
 def start():
 
-    Popen('spotify', shell=True)
+    Popen('spotify 1>/dev/null 2>&1', shell=True)
+    # Safe wait to ensure we can minimize the app in order to stop
+    # Spotify main window to load lots of widgets...
+    sleep(10)
+    Popen('xdotool search --name Spotify windowminimize %@', shell=True)
+
 
     if not check_Spotify_Desktop_process():
         print('(spotify_monitor) Unable to detect Spotify Desktop running')

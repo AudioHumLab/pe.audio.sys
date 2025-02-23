@@ -11,6 +11,22 @@ if [[ ! $VIRTUAL_ENV ]]; then
 fi
 
 
+
+function print_help {
+
+    echo
+    echo "USAGE:   peaudiosys_restart.sh  [ start [new_sample_rate] [--noretry]   |   stop ]"
+    echo
+    echo "         --noretry   will skip retrying up to 3 times"
+    echo
+    echo "         Startup process will be logged in <pe.audio.sys/log/start.log>"
+    echo "         For further debugging run manually from a terminal:"
+    echo "             peaudio.sys/start.py all & "
+    echo
+
+}
+
+
 function do_stop {
     echo '(i) STOPPING pe.audio.sys'
     $HOME/pe.audio.sys/start.py stop
@@ -73,21 +89,97 @@ function do_start {
 }
 
 
-if [[ $1 == 'stop' ]]; then
+function modify_sample_rate {
+    # $1 must be the new sample_rate value
+    tmp="sample_rate: ""$1"
+    sed -i -e "/^sample_rate:/c\\$tmp"   $HOME/pe.audio.sys/config/config.yml
+}
+
+
+function get_lspk_sample_rates {
+
+    lspk=$( grep "^loudspeaker:" ~/pe.audio.sys/config/config.yml | grep -v \# | awk '{print $NF}' )
+
+    lspk_folder=$HOME/pe.audio.sys/loudspeakers/"$lspk"
+
+    lspk_sample_rates=($(find "$lspk_folder" -mindepth 1 -maxdepth 1 -type d -exec basename {} \;))
+}
+
+
+# __MAIN__
+
+
+# Read command-line arguments:
+mode='start'
+noretry=0
+fs=0
+fs_values=("0" "44100" "88200" "48000" "96000" "192000")
+lspk_sample_rates=()
+
+for arg in "$@"; do
+
+    if [[ $arg == *"-h"* || $arg == "help" ]]; then
+        print_help
+        exit 0
+
+    elif [[ $arg == 'stop' ]]; then
+        mode='stop'
+
+    elif [[ $arg == *"-n"* ]]; then
+        noretry=1
+
+    else
+        fs=$arg
+    fi
+
+done
+
+
+# Validate the sample rate value:
+fs_ok="no"
+
+for fsv in "${fs_values[@]}"; do
+    if [[ $fs == $fsv ]]; then
+        fs_ok="yes"
+    fi
+done
+
+if [[ $fs_ok != "yes"  ]]; then
+    echo BAD sampling rate $fs
+    exit 1
+fi
+
+
+# Modify config.yml with the new sample_rate if desired:
+if [[ $fs != "0" ]]; then
+
+    # Validate if the loudspeaker has the desired samplerate:
+    fs_ok="no"
+
+    get_lspk_sample_rates
+
+    for lsr in "${lspk_sample_rates[@]}"; do
+        if [[ $lsr == $fs ]]; then
+            fs_ok="yes"
+        fi
+    done
+
+    if [[ $fs_ok == "yes"  ]]; then
+        modify_sample_rate $fs
+    fi
+fi
+
+
+# Go:
+if [[ $mode == 'stop' ]]; then
     do_stop
 
-elif [[ ! $1 || $1 == *'start' ]]; then
-    do_start $2
+elif [[ $mode == 'start' ]]; then
+    do_start $noretry
 
 else
-    echo
-    echo "USAGE:   peaudiosys_restart.sh  [ start [--noretry]  |  stop ]"
-    echo
-    echo "         --noretry   will skip retrying up to 3 times"
-    echo
-    echo "         Startup process will be logged in <pe.audio.sys/log/start.log>"
-    echo "         For further debugging run manually from a terminal:"
-    echo "             peaudio.sys/start.py all & "
-    echo
-
+    print_help
+    exit 0
 fi
+
+exit 0

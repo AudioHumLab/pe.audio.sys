@@ -33,8 +33,9 @@ if CONFIG["use_compressor"]:
     import  camilla_dsp as cdsp
     # Initiate the websocket
     cdsp.PC.connect()
-    # Camilla compresor is baypassed at startup
-    preamp.state["compressor"] = 'off'
+
+# Anyway the compresor stage is baypassed at startup
+preamp.state["compressor"] = 'off'
 
 
 # Interface function for this module
@@ -122,6 +123,11 @@ def do( cmd, argstring ):
 
 
     def manage_compressor(x, *dummy):
+
+        res = 'not available'
+
+        if not CONFIG["use_compressor"]:
+            return res
 
         x = x.split()
         oper = arg = ''

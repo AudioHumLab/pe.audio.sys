@@ -28,6 +28,12 @@ from    miscel      import  *
 from    peq_mod     import eca_bypass, eca_load_peq
 
 
+
+def restart_to_sample_rate(value):
+    sp.Popen(f'{UHOME}/bin/peaudiosys_restart.sh {value}', shell=True)
+    return 'ordered ... ..\nPLEASE RELOAD THIS PAGE WHEN\nTHE CONNECTION IS RESTORED'
+
+
 def dump_aux_info():
     """ A helper to write AUX_INFO dict to a file to be accesible
         by third party processes
@@ -170,6 +176,9 @@ def get_web_config():
 
     # Optional compressor
     wconfig["use_compressor"] = True if CONFIG["use_compressor"] else False
+
+    # Loudspeaker available sample rates:
+    wconfig["lspk_sample_rates"] = get_loudspeaker_sample_rates()
 
     return wconfig
 
@@ -633,6 +642,12 @@ def do( cmd, arg=None ):
 
     elif cmd == 'get_web_config':
         result = get_web_config()
+
+    elif cmd == 'get_loudspeaker_sample_rates':
+        result = get_loudspeaker_sample_rates()
+
+    elif cmd == 'restart_to_sample_rate':
+        result = restart_to_sample_rate(arg)
 
     elif cmd == 'help':
         result = get_help()

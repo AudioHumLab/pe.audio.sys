@@ -112,12 +112,14 @@ if __name__ == "__main__" :
         print('brutefir process NOT running')
         sys.exit()
 
-    # Gets the loudspeaker folder where brutefir has been launched
+    # Gets the folder where brutefir has been launched
     try:
-        tmp = sp.check_output( 'pwdx $(pgrep -f "brutefir\ brutefir_config")',
+        # pwdx - report current working directory of a process
+        tmp = sp.check_output( 'pwdx $(pgrep -f "brutefir brutefir_config")',
                                 shell=True ).decode()
-        LSPK_FOLDER = tmp.split('\n')[0].split(' ')[-1]
-        BRUTEFIR_CONFIG_PATH = f'{LSPK_FOLDER}/brutefir_config'
+        BRUTEFIR_FOLDER = tmp.split('\n')[0].split(' ')[-1]
+        BRUTEFIR_CONFIG_PATH = f'{BRUTEFIR_FOLDER}/brutefir_config'
+
     except:
         print( 'ERROR reading brutefir process' )
         sys.exit()

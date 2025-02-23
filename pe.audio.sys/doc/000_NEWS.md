@@ -114,6 +114,7 @@ See the `doc/` folder for detailed information about this.
 - New optional compressor useful for watching movies with difficult dialogue dynamics at low listening levels.
 
 ## Feb 2025, version 2.0a
-- adapt to PipeWire (optional)
-- update some doc about DVB-T and LCD
+- New control command to restart to another available sampling rate
+- Adapt to PipeWire (optional)
+- Update some doc about DVB-T and LCD
   

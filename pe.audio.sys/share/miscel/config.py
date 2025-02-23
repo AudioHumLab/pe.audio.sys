@@ -29,6 +29,9 @@ from    getpass import getuser
 USER                = getuser()
 UHOME               = os.path.expanduser("~")
 MAINFOLDER          = f'{UHOME}/pe.audio.sys'
+
+VALID_SAMPLE_RATES  = [44100, 48000, 88200, 96000, 192000]
+
 CONFIG              = {}
 LOUDSPEAKER         = ''
 EQ_CURVES           = {}

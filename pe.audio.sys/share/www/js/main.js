@@ -33,7 +33,8 @@ var web_config          = { 'main_selector':      'inputs',
                             'hide_LU':            false,
                             'LU_monitor_enabled': false,
                             'show_graphs':        false,
-                            'user_macros':        []
+                            'user_macros':        [],
+                            'lspk_sample_rates':  []
 };
 
 var main_sel_mode       = web_config.main_selector;
@@ -141,7 +142,6 @@ function fill_in_page_statics(){
         }
     }
 
-
     function fill_in_xo_selector() {
         try{
             var xo_sets = JSON.parse( control_cmd( 'get_xo_sets' ) );
@@ -205,6 +205,21 @@ function fill_in_page_statics(){
     }
 
 
+    function fill_in_samplerateSelector(){
+
+        select_clear_options("samplerateSelector");
+
+        const mySel = document.getElementById("samplerateSelector");
+
+        for ( const i in web_config.lspk_sample_rates ) {
+            var option = document.createElement("option");
+            option.text = web_config.lspk_sample_rates[i];
+            mySel.add(option);
+        }
+        mySel.value = state.fs;
+    }
+
+
     main_cside_msg = ':: pe.audio.sys :: ' + state.loudspeaker;
 
 
@@ -221,6 +236,8 @@ function fill_in_page_statics(){
     fill_in_drc_selector();
 
     fill_in_LUscope_selector();
+
+    fill_in_samplerateSelector();
 
 }
 
@@ -804,7 +821,7 @@ function page_update() {
     state_get();
 
     //  Cancel updating if not connected
-    if (!server_available){
+    if (! server_available){
         document.getElementById("levelInfo").innerHTML  = '--';
         document.getElementById("main_cside").innerText = ':: pe.audio.sys :: not connected';
         player_info_clear();
@@ -1072,6 +1089,20 @@ function ck_play_url() {
 
 //////// HANDLERS: AUX 'onmousedown' 'onclick' 'oninput' ////////
 
+function oc_restart_samplerate(value){
+
+    const s = document.getElementById("samplerateSelector");
+
+    if ( confirm('Are you sure to restart to sampling rate: ' + value) ){
+        const ans = control_cmd('aux restart_to_sample_rate ' + value);
+        s.value = null;
+        alert(ans);
+
+    }else{
+        s.value = state.fs;
+    };
+}
+
 function ck_peaudiosys_restart() {
     control_cmd('restart_peaudiosys');
     ck_display_advanced('off');
@@ -1158,6 +1189,7 @@ function ck_display_advanced(mode) {
         document.getElementById("bt_swap_lr").style.display = "inline-block";
         document.getElementById("bt_subsonic").style.display = "inline-block";
         document.getElementById("bt_tone_defeat").style.display = "inline-block";
+        document.getElementById("samplerateSelector").style.display = "inline-block";
         if (web_config.use_compressor){
             document.getElementById("bt_compressor").style.display = "inline-block";
         }
@@ -1181,6 +1213,7 @@ function ck_display_advanced(mode) {
         }
         document.getElementById("bt_subsonic").style.display = "none";
         document.getElementById("bt_tone_defeat").style.display = "none";
+        document.getElementById("samplerateSelector").style.display = "none";
         document.getElementById("bt_compressor").style.display = "none";
     }
 }
